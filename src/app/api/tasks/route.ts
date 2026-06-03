@@ -1,0 +1,133 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { sendNotification } from "@/lib/notifications";
+import {
+  buildTaskCreatedMessage,
+} from "@/lib/whatsapp";
+
+const createTaskSchema = z.object({
+  title: z.string().min(2, "Título obrigatório"),
+  description: z.string().optional().nullable(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).default("MEDIUM"),
+  assignedToId: z.string().optional().nullable(),
+  clientId: z.string().optional().nullable(),
+  deadline: z.string().optional().nullable(),
+  templateId: z.string().optional().nullable(),
+});
+
+export async function GET(req: NextRequest) {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  const status = searchParams.get("status");
+  const priority = searchParams.get("priority");
+  const assignedTo = searchParams.get("assignedTo");
+  const clientId = searchParams.get("clientId");
+
+  const where: Record<string, unknown> = {
+    companyId: session.user.companyId,
+  };
+
+  const isAdmin = session.user.role === "ADMIN" || session.user.role === "MANAGER";
+  if (!isAdmin) where.assignedToId = session.user.id;
+  if (status) where.status = status;
+  if (priority) where.priority = priority;
+  if (assignedTo) where.assignedToId = assignedTo;
+  if (clientId) where.clientId = clientId;
+
+  const tasks = await prisma.task.findMany({
+    where,
+    orderBy: [{ priority: "desc" }, { deadline: "asc" }, { createdAt: "desc" }],
+    include: {
+      assignedTo: { select: { id: true, name: true } },
+      client: { select: { id: true, name: true } },
+      _count: { select: { comments: true, attachments: true } },
+    },
+  });
+
+  return NextResponse.json(tasks);
+}
+
+export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+
+  const isAdmin = session.user.role === "ADMIN" || session.user.role === "MANAGER";
+  if (!isAdmin) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
+
+  try {
+    const body = await req.json();
+    const parsed = createTaskSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0].message },
+        { status: 400 }
+      );
+    }
+
+    const data = parsed.data;
+
+    const task = await prisma.task.create({
+      data: {
+        title: data.title,
+        description: data.description,
+        priority: data.priority,
+        assignedToId: data.assignedToId || null,
+        clientId: data.clientId || null,
+        deadline: data.deadline ? new Date(data.deadline) : null,
+        templateId: data.templateId || null,
+        companyId: session.user.companyId,
+        createdById: session.user.id,
+      },
+      include: {
+        assignedTo: { select: { name: true } },
+        client: { select: { name: true } },
+        createdBy: { select: { name: true } },
+      },
+    });
+
+    // Audit log
+    await prisma.taskHistory.create({
+      data: {
+        taskId: task.id,
+        userId: session.user.id,
+        action: "CREATED",
+        newValue: task.title,
+      },
+    });
+
+    // Notificação interna para o responsável
+    if (task.assignedToId && task.assignedToId !== session.user.id) {
+      await prisma.notification.create({
+        data: {
+          userId: task.assignedToId,
+          type: "TASK_ASSIGNED",
+          title: "Nova tarefa atribuída",
+          body: `Você foi designado para: ${task.title}`,
+          link: `/tasks/${task.id}`,
+        },
+      });
+    }
+
+    // Notificação externa (WhatsApp + Telegram)
+    const message = buildTaskCreatedMessage({
+      title: task.title,
+      priority: task.priority,
+      assignedTo: task.assignedTo?.name,
+      client: task.client?.name,
+      deadline: task.deadline,
+      createdBy: task.createdBy.name,
+    });
+
+    sendNotification(session.user.companyId, message).catch(console.error);
+
+    return NextResponse.json(task, { status: 201 });
+  } catch (error) {
+    console.error("Create task error:", error);
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+  }
+}

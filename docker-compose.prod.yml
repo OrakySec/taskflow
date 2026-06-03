@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # ──────────────────────────────────────────────────────────────────────────────
+  # Aplicação Next.js
+  # ──────────────────────────────────────────────────────────────────────────────
+  app:
+    image: ghcr.io/orakysec/taskflow:latest
+    environment:
+      DATABASE_URL: "postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/taskflow"
+      NEXTAUTH_URL: "https://taskflow.ykaromarques.com"
+      AUTH_SECRET: "${AUTH_SECRET}"
+      MINIO_ENDPOINT: "minio"
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+      MINIO_BUCKET: "taskflow-files"
+      MINIO_USE_SSL: "false"
+      RESEND_API_KEY: "${RESEND_API_KEY}"
+      RESEND_FROM: "TaskFlow <noreply@ykaromarques.com>"
+      NEXT_PUBLIC_APP_URL: "https://taskflow.ykaromarques.com"
+      CRON_SECRET: "${CRON_SECRET}"
+    networks:
+      - YkaroNET
+      - internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=YkaroNET"
+        - "traefik.http.routers.taskflow.rule=Host(`taskflow.ykaromarques.com`)"
+        - "traefik.http.routers.taskflow.entrypoints=websecure"
+        - "traefik.http.routers.taskflow.tls.certresolver=letsencryptresolver"
+        - "traefik.http.services.taskflow.loadbalancer.server.port=3000"
+
+  # ──────────────────────────────────────────────────────────────────────────────
+  # PostgreSQL
+  # ──────────────────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: taskflow
+    volumes:
+      - taskflow_postgres_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # ──────────────────────────────────────────────────────────────────────────────
+  # MinIO (Storage)
+  # ──────────────────────────────────────────────────────────────────────────────
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ACCESS_KEY}"
+      MINIO_ROOT_PASSWORD: "${MINIO_SECRET_KEY}"
+    volumes:
+      - taskflow_minio_data:/data
+    networks:
+      - internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  # ──────────────────────────────────────────────────────────────────────────────
+  # Cron — alertas de prazo + resumo diário
+  # ──────────────────────────────────────────────────────────────────────────────
+  cron:
+    image: alpine:3.19
+    entrypoint:
+      - sh
+      - -c
+      - |
+        apk add --no-cache curl -q
+        printf '*/5 * * * * curl -sf -X POST http://app:3000/api/cron/deadline-check -H "Authorization: Bearer '"$$CRON_SECRET"'" -o /dev/null\n0 8 * * * curl -sf -X POST http://app:3000/api/cron/daily-summary -H "Authorization: Bearer '"$$CRON_SECRET"'" -o /dev/null\n0 9 * * 1 curl -sf -X POST http://app:3000/api/cron/weekly-ranking -H "Authorization: Bearer '"$$CRON_SECRET"'" -o /dev/null\n' > /etc/crontabs/root
+        crond -f -l 6
+    environment:
+      CRON_SECRET: "${CRON_SECRET}"
+    networks:
+      - internal
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+networks:
+  YkaroNET:
+    external: true
+  internal:
+    driver: overlay
+    attachable: true
+
+volumes:
+  taskflow_postgres_data:
+  taskflow_minio_data:

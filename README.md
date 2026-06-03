@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskFlow — Sistema de Organização de Tarefas
 
-## Getting Started
+Sistema web para delegação e acompanhamento de tarefas com notificações via WhatsApp e Telegram.
 
-First, run the development server:
+## Stack
+
+- **Frontend/Backend:** Next.js 16 (App Router) + TypeScript
+- **Banco de Dados:** PostgreSQL + Prisma ORM
+- **Autenticação:** NextAuth v5 (JWT)
+- **E-mail:** Resend
+- **Armazenamento:** MinIO
+- **Notificações:** Evolution API (WhatsApp) + Telegram Bot API
+- **Deploy:** Docker Swarm + Traefik + Let's Encrypt
+
+## Desenvolvimento Local
 
 ```bash
+npm install
+docker compose up -d        # Postgres + MinIO
+cp .env.example .env        # Configure o .env
+npx prisma migrate dev
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse: http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy (VPS Docker Swarm)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Faça push para `main` — o GitHub Actions faz o resto automaticamente.
 
-## Learn More
+Secrets necessários no repositório:
+- `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`
 
-To learn more about Next.js, take a look at the following resources:
+## Funcionalidades
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Multi-tenant (múltiplas empresas isoladas)
+- Tarefas com prioridade e prazo
+- Status: Aberta → Em Andamento → Concluída / Falhou
+- Chat por tarefa com @menções
+- Histórico de alterações com timeline
+- Ranking semanal de produtividade
+- Notificações WhatsApp (Evolution API) + Telegram
+- Convite de colaboradores por e-mail
+- Controle de acesso por role (Admin / Gerente / Colaborador)
