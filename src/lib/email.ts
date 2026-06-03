@@ -1,6 +1,11 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy: instanciado só em runtime, não durante o build
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error("RESEND_API_KEY não configurada.");
+  return new Resend(key);
+}
 
 const FROM = process.env.RESEND_FROM || "TaskFlow <no-reply@ykaromarques.com>";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -18,7 +23,7 @@ export async function sendInviteEmail({
 }) {
   const inviteUrl = `${APP_URL}/invite/${inviteToken}`;
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `Você foi convidado para o ${companyName} no TaskFlow`,
@@ -63,7 +68,7 @@ export async function sendPasswordResetEmail({
 }) {
   const resetUrl = `${APP_URL}/reset-password/${resetToken}`;
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: "Redefinição de senha — TaskFlow",
