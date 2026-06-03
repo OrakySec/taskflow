@@ -1,4 +1,4 @@
-name: Build & Deploy TaskFlow
+name: Build & Push TaskFlow
 
 on:
   push:
@@ -17,16 +17,9 @@ jobs:
       contents: read
       packages: write
 
-    outputs:
-      image_sha: ghcr.io/orakysec/taskflow:sha-${{ steps.sha.outputs.short }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Short SHA
-        id: sha
-        run: echo "short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -56,43 +49,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  deploy:
-    name: 🚀 Deploy to VPS
-    runs-on: ubuntu-latest
-    needs: build-and-push
-    environment: production
-
-    steps:
-      - name: Checkout (para pegar o compose)
-        uses: actions/checkout@v4
-
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            set -e
-
-            # Login no GHCR com token de deploy
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u orakysec --password-stdin
-
-            # Garante que a pasta da stack existe
-            mkdir -p /opt/stacks/taskflow
-
-            # Copia o compose atualizado
-            cat > /opt/stacks/taskflow/docker-compose.prod.yml << 'COMPOSE_EOF'
-            $(cat docker-compose.prod.yml)
-            COMPOSE_EOF
-
-            # Deploy/atualiza a stack no Swarm
-            cd /opt/stacks/taskflow
-            docker stack deploy \
-              -c docker-compose.prod.yml \
-              taskflow \
-              --with-registry-auth \
-              --prune
-
-            echo "✅ Deploy concluído! Imagem: ghcr.io/orakysec/taskflow:sha-${{ needs.build-and-push.outputs.image_sha }}"
