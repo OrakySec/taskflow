@@ -14,7 +14,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN npx prisma generate
+RUN node_modules/.bin/prisma generate
 RUN npm run build
 
 # ── Production image ─────────────────────────────────────────────
@@ -32,6 +32,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
 USER nextjs
 
@@ -41,4 +42,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Roda migrations e inicia o servidor
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node server.js"]
