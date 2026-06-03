@@ -22,7 +22,6 @@ services:
       CRON_SECRET: "${CRON_SECRET}"
     networks:
       - YkaroNET
-      - internal
     deploy:
       replicas: 1
       restart_policy:
@@ -49,14 +48,17 @@ services:
     volumes:
       - taskflow_postgres_data:/var/lib/postgresql/data
     networks:
-      - internal
+      - YkaroNET
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
 
   # ──────────────────────────────────────────────────────────────────────────────
-  # MinIO (Storage)
+  # MinIO (Storage de anexos)
   # ──────────────────────────────────────────────────────────────────────────────
   minio:
     image: minio/minio
@@ -67,11 +69,14 @@ services:
     volumes:
       - taskflow_minio_data:/data
     networks:
-      - internal
+      - YkaroNET
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
 
   # ──────────────────────────────────────────────────────────────────────────────
   # Cron — alertas de prazo + resumo diário
@@ -83,12 +88,12 @@ services:
       - -c
       - |
         apk add --no-cache curl -q
-        printf '*/5 * * * * curl -sf -X POST http://app:3000/api/cron/deadline-check -H "Authorization: Bearer '"$$CRON_SECRET"'" -o /dev/null\n0 8 * * * curl -sf -X POST http://app:3000/api/cron/daily-summary -H "Authorization: Bearer '"$$CRON_SECRET"'" -o /dev/null\n0 9 * * 1 curl -sf -X POST http://app:3000/api/cron/weekly-ranking -H "Authorization: Bearer '"$$CRON_SECRET"'" -o /dev/null\n' > /etc/crontabs/root
+        printf '*/5 * * * * curl -sf -X POST http://app:3000/api/cron/deadline-check -H "Authorization: Bearer '"$$CRON_SECRET"'" -o /dev/null\n0 8 * * * curl -sf -X POST http://app:3000/api/cron/daily-summary -H "Authorization: Bearer '"$$CRON_SECRET"'" -o /dev/null\n' > /etc/crontabs/root
         crond -f -l 6
     environment:
       CRON_SECRET: "${CRON_SECRET}"
     networks:
-      - internal
+      - YkaroNET
     deploy:
       replicas: 1
       restart_policy:
@@ -97,9 +102,6 @@ services:
 networks:
   YkaroNET:
     external: true
-  internal:
-    driver: overlay
-    attachable: true
 
 volumes:
   taskflow_postgres_data:
