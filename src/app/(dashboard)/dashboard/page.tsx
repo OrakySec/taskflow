@@ -303,6 +303,13 @@ export default async function DashboardPage() {
                   const medal = medals[index] ?? `${index + 1}º`;
                   const max = tasksByUser[0]?._count.assignedTasks || 1;
                   const pct = Math.max((user._count.assignedTasks / max) * 100, 5); // min 5% for visual
+                  
+                  const gradientClasses = [
+                    "from-indigo-500 to-purple-500",
+                    "from-blue-500 to-indigo-500",
+                    "from-emerald-500 to-blue-500"
+                  ];
+                  const barGradient = gradientClasses[index] || "from-slate-400 to-slate-500";
 
                   return (
                     <div key={user.id} className="flex flex-col gap-1.5">
@@ -317,12 +324,7 @@ export default async function DashboardPage() {
                       </div>
                       <div className="h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-1000 ease-out bg-gradient-to-r ${
-                            index === 0 ? "from-indigo-500 to-purple-500" :
-                            index === 1 ? "from-blue-500 to-indigo-500" :
-                            index === 2 ? "from-emerald-500 to-blue-500" :
-                            "from-slate-400 to-slate-500"
-                          }`}
+                          className={`h-full rounded-full transition-all duration-1000 ease-out bg-gradient-to-r ${barGradient}`}
                           style={{
                             width: `${pct}%`
                           }}

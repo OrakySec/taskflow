@@ -15,7 +15,7 @@
   /* Premium animated background mesh for dark mode */
   body::before {
     content: "";
-    @apply absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_20%_-20%,rgba(99,102,241,0.35),rgba(255,255,255,0)),radial-gradient(ellipse_80%_80%_at_80%_120%,rgba(168,85,247,0.25),rgba(255,255,255,0))] pointer-events-none;
+    @apply fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.25),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_80%_80%_at_20%_-20%,rgba(99,102,241,0.35),rgba(255,255,255,0)),radial-gradient(ellipse_80%_80%_at_80%_120%,rgba(168,85,247,0.25),rgba(255,255,255,0))] pointer-events-none;
   }
 }
 
