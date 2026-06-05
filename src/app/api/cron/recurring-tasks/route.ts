@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import { sendNotification } from "@/lib/notifications";
 
 export async function POST() {
   const headersList = await headers();
@@ -66,8 +67,6 @@ export async function POST() {
 
     // Enviar notificação externa (WhatsApp/Telegram)
     const msg = `🔄 *Nova Tarefa Recorrente*\n\n*${rt.title}*\nFoi gerada automaticamente pelo sistema.`;
-    // Vamos importar sendNotification no topo do arquivo (ou fazer o import dinâmico)
-    const { sendNotification } = require("@/lib/notifications");
     await sendNotification(rt.companyId, msg);
 
     created++;

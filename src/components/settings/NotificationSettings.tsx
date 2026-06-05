@@ -19,6 +19,30 @@ interface NotificationSettingsProps {
   initialConfig: NotificationConfig | null;
 }
 
+const Toggle = ({
+  enabled,
+  onChange,
+}: {
+  enabled: boolean;
+  onChange: (v: boolean) => void;
+}) => (
+  <button
+    type="button"
+    onClick={() => onChange(!enabled)}
+    style={{
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      color: enabled ? "var(--accent-hover)" : "var(--text-muted)",
+      display: "flex",
+      alignItems: "center",
+      transition: "color 0.2s",
+    }}
+  >
+    {enabled ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
+  </button>
+);
+
 export default function NotificationSettings({ initialConfig }: NotificationSettingsProps) {
   const [config, setConfig] = useState<NotificationConfig>({
     whatsappEnabled: initialConfig?.whatsappEnabled ?? false,
@@ -69,29 +93,6 @@ export default function NotificationSettings({ initialConfig }: NotificationSett
     }
   }
 
-  const Toggle = ({
-    enabled,
-    onChange,
-  }: {
-    enabled: boolean;
-    onChange: (v: boolean) => void;
-  }) => (
-    <button
-      type="button"
-      onClick={() => onChange(!enabled)}
-      style={{
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        color: enabled ? "var(--accent-hover)" : "var(--text-muted)",
-        display: "flex",
-        alignItems: "center",
-        transition: "color 0.2s",
-      }}
-    >
-      {enabled ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
-    </button>
-  );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
