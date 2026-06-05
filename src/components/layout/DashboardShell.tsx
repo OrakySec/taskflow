@@ -35,7 +35,7 @@ export default function DashboardShell({
           isCollapsed={isSidebarCollapsed}
         />
         <main className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 custom-scrollbar">
-          <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
             {children}
           </div>
         </main>
