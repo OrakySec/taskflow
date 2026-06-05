@@ -139,15 +139,7 @@ export default function KanbanBoard({ initialTasks }: KanbanBoardProps) {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div
-        style={{
-          display: "flex",
-          gap: "24px",
-          overflowX: "auto",
-          paddingBottom: "16px",
-          height: "100%",
-        }}
-      >
+      <div className="flex gap-6 overflow-x-auto pb-4 h-full custom-scrollbar">
         {COLUMNS.map((col) => (
           <KanbanColumn
             key={col.id}

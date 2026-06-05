@@ -78,16 +78,7 @@ export default async function TasksPage({ searchParams }: PageProps) {
   return (
     <div>
       {/* Header */}
-      <div
-        className="flex-col-mobile"
-        style={{
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          marginBottom: "24px",
-          gap: "16px",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="flex flex-col md:flex-row md:items-start justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="page-title">Tarefas</h1>
           <p className="page-subtitle">
@@ -96,7 +87,7 @@ export default async function TasksPage({ searchParams }: PageProps) {
           </p>
         </div>
         {isAdmin && (
-          <Link href="/tasks/new" className="btn btn-primary w-full-mobile" style={{ justifyContent: "center" }}>
+          <Link href="/tasks/new" className="btn btn-primary w-full md:w-auto justify-center">
             <Plus size={16} />
             Nova Tarefa
           </Link>
@@ -112,7 +103,7 @@ export default async function TasksPage({ searchParams }: PageProps) {
       />
 
       {/* Task Kanban Board */}
-      <div style={{ flex: 1, minHeight: 0, height: "calc(100vh - 200px)" }}>
+      <div className="flex-1 min-h-0 h-[calc(100vh-200px)]">
         <KanbanBoard initialTasks={tasks as any} />
       </div>
     </div>

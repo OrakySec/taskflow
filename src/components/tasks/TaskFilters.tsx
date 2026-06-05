@@ -57,26 +57,12 @@ export default function TaskFilters({
   const hasFilters = Object.values(currentParams).some(Boolean);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "10px",
-        marginBottom: "24px",
-        alignItems: "center",
-      }}
-    >
+    <div className="flex flex-wrap gap-3 mb-6 items-center">
       {/* Search */}
-      <div className="w-full-mobile" style={{ position: "relative", flex: "1 1 200px", maxWidth: "300px" }}>
+      <div className="relative flex-1 min-w-[200px] max-w-[300px] w-full md:w-auto">
         <Search
           size={14}
-          style={{
-            position: "absolute",
-            left: "12px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            color: "var(--text-muted)",
-          }}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
         />
         <input
           type="text"
@@ -89,14 +75,13 @@ export default function TaskFilters({
               updateFilter("q", e.target.value);
             }, 400);
           }}
-          style={{ paddingLeft: "36px" }}
+          className="input pl-9"
         />
       </div>
 
       {/* Status filter */}
       <select
-        className="select w-full-mobile"
-        style={{ flex: "0 0 auto", width: "auto", minWidth: "160px" }}
+        className="select flex-none w-full md:w-auto min-w-[160px]"
         value={currentParams.status || ""}
         onChange={(e) => updateFilter("status", e.target.value)}
       >
@@ -109,8 +94,7 @@ export default function TaskFilters({
 
       {/* Priority filter */}
       <select
-        className="select w-full-mobile"
-        style={{ flex: "0 0 auto", width: "auto", minWidth: "180px" }}
+        className="select flex-none w-full md:w-auto min-w-[180px]"
         value={currentParams.priority || ""}
         onChange={(e) => updateFilter("priority", e.target.value)}
       >
@@ -124,8 +108,7 @@ export default function TaskFilters({
       {/* Assigned to filter (admin only) */}
       {isAdmin && users.length > 0 && (
         <select
-          className="select w-full-mobile"
-          style={{ flex: "0 0 auto", width: "auto", minWidth: "180px" }}
+          className="select flex-none w-full md:w-auto min-w-[180px]"
           value={currentParams.assignedTo || ""}
           onChange={(e) => updateFilter("assignedTo", e.target.value)}
         >
@@ -141,8 +124,7 @@ export default function TaskFilters({
       {/* Client filter */}
       {clients.length > 0 && (
         <select
-          className="select w-full-mobile"
-          style={{ flex: "0 0 auto", width: "auto", minWidth: "160px" }}
+          className="select flex-none w-full md:w-auto min-w-[160px]"
           value={currentParams.clientId || ""}
           onChange={(e) => updateFilter("clientId", e.target.value)}
         >
@@ -158,9 +140,8 @@ export default function TaskFilters({
       {/* Clear filters */}
       {hasFilters && (
         <button
-          className="btn btn-ghost btn-sm w-full-mobile"
+          className="btn btn-ghost btn-sm w-full md:w-auto flex items-center justify-center gap-1 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
           onClick={clearAll}
-          style={{ gap: "4px", color: "var(--text-muted)", justifyContent: "center" }}
         >
           <X size={13} />
           Limpar

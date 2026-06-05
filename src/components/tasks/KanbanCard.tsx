@@ -50,56 +50,52 @@ export default function KanbanCard({ task }: KanbanCardProps) {
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className={`card ${isDragging ? "ring-2 ring-indigo-500 shadow-xl" : ""}`}
+      className={`card glass-panel-hover relative cursor-grab mb-3 flex flex-col border-l-[3px] ${
+        task.priority === "URGENT" ? "border-l-red-500" :
+        task.priority === "HIGH" ? "border-l-orange-500" :
+        task.priority === "MEDIUM" ? "border-l-amber-500" : "border-l-emerald-500"
+      } ${isDragging ? "ring-2 ring-indigo-500 shadow-xl opacity-40" : "opacity-100"}`}
       style={{
-        padding: "16px",
-        cursor: "grab",
-        marginBottom: "12px",
-        position: "relative",
-        borderLeft: `3px solid var(--${
-          task.priority === "URGENT" ? "red" :
-          task.priority === "HIGH" ? "orange" :
-          task.priority === "MEDIUM" ? "yellow" : "green"
-        })`,
-        ...style
+        transform: CSS.Transform.toString(transform),
+        transition,
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-        <span className={`badge priority-${task.priority}`} style={{ fontSize: "10px", padding: "2px 6px" }}>
+      <div className="flex justify-between items-start mb-2">
+        <span className={`badge priority-${task.priority}`}>
           {PRIORITY_LABELS[task.priority]}
         </span>
         {task.client && (
-          <span style={{ fontSize: "11px", color: "var(--text-muted)", maxWidth: "100px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 max-w-[100px] truncate">
             {task.client.name}
           </span>
         )}
       </div>
 
-      <div style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)", marginBottom: "12px", lineHeight: "1.4" }}>
+      <div className="text-sm font-semibold text-slate-900 dark:text-white mb-3 leading-snug">
         {task.title}
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-muted)", fontSize: "12px" }}>
+      <div className="flex items-center justify-between mt-auto">
+        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
           {task.deadline && (
-            <div style={{ display: "flex", alignItems: "center", gap: "4px" }} className={isOverdue ? "overdue" : ""}>
+            <div className={`flex items-center gap-1 ${isOverdue ? "text-red-500 font-medium" : ""}`}>
               <Clock size={12} /> {formatDate(task.deadline)}
             </div>
           )}
           {(task._count.comments > 0 || task._count.attachments > 0) && (
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              {task._count.comments > 0 && <span style={{ display: "flex", alignItems: "center", gap: "2px" }}><MessageSquare size={12} /> {task._count.comments}</span>}
-              {task._count.attachments > 0 && <span style={{ display: "flex", alignItems: "center", gap: "2px" }}><Paperclip size={12} /> {task._count.attachments}</span>}
+            <div className="flex items-center gap-1.5">
+              {task._count.comments > 0 && <span className="flex items-center gap-0.5"><MessageSquare size={12} /> {task._count.comments}</span>}
+              {task._count.attachments > 0 && <span className="flex items-center gap-0.5"><Paperclip size={12} /> {task._count.attachments}</span>}
             </div>
           )}
         </div>
 
         {task.assignedTo ? (
-          <div className="avatar avatar-sm" title={task.assignedTo.name}>
+          <div className="avatar avatar-sm ring-2 ring-white dark:ring-[#161925]" title={task.assignedTo.name}>
             {getInitials(task.assignedTo.name)}
           </div>
         ) : (
-          <div className="avatar avatar-sm" style={{ background: "transparent", border: "1px dashed var(--border)", color: "var(--text-muted)" }}>
+          <div className="avatar avatar-sm bg-transparent border border-dashed border-slate-300 dark:border-slate-600 text-slate-400" title="Não atribuído">
             ?
           </div>
         )}
@@ -108,7 +104,7 @@ export default function KanbanCard({ task }: KanbanCardProps) {
       <Link 
         href={`/tasks/${task.id}`} 
         onClick={(e) => e.stopPropagation()} 
-        style={{ position: "absolute", inset: 0, opacity: 0 }} 
+        className="absolute inset-0 opacity-0"
         aria-label="Ver detalhes"
       />
     </div>

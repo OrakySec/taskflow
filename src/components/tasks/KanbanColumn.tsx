@@ -35,61 +35,28 @@ export default function KanbanColumn({ column, tasks }: KanbanColumnProps) {
   });
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        background: "var(--bg-secondary)",
-        borderRadius: "12px",
-        minWidth: "300px",
-        maxWidth: "300px",
-        height: "100%",
-        maxHeight: "calc(100vh - 200px)",
-        border: "1px solid var(--border)",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          padding: "16px",
-          borderBottom: "1px solid var(--border)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          background: "var(--bg-card)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <div className="flex flex-col bg-slate-50/50 dark:bg-white/5 backdrop-blur-md rounded-2xl min-w-[300px] max-w-[300px] h-full max-h-[calc(100vh-200px)] border border-slate-200/60 dark:border-white/10 overflow-hidden shadow-sm">
+      <div className="p-4 border-b border-slate-200/60 dark:border-white/10 flex items-center justify-between bg-white/60 dark:bg-[#111116]/60 backdrop-blur-md">
+        <div className="flex items-center gap-2">
           <div
-            style={{
-              width: "10px",
-              height: "10px",
-              borderRadius: "50%",
-              background: `var(--${
-                column.id === "DONE" ? "green" :
-                column.id === "FAILED" ? "red" :
-                column.id === "IN_PROGRESS" ? "blue" : "text-muted"
-              })`
-            }}
+            className={`w-2.5 h-2.5 rounded-full ${
+              column.id === "DONE" ? "bg-emerald-500" :
+              column.id === "FAILED" ? "bg-red-500" :
+              column.id === "IN_PROGRESS" ? "bg-blue-500" : "bg-slate-400"
+            }`}
           />
-          <h3 style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)" }}>
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
             {column.title}
           </h3>
         </div>
-        <span className="badge" style={{ background: "var(--bg-secondary)" }}>
+        <span className="badge bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-slate-300 border-none px-2 py-0.5">
           {tasks.length}
         </span>
       </div>
 
       <div
         ref={setNodeRef}
-        style={{
-          flex: 1,
-          padding: "12px",
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-        }}
+        className="flex-1 p-3 overflow-y-auto custom-scrollbar flex flex-col"
       >
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (

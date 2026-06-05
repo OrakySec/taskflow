@@ -1,7 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Sidebar from "@/components/layout/Sidebar";
-import Header from "@/components/layout/Header";
+import DashboardShell from "@/components/layout/DashboardShell";
 import SessionProvider from "@/components/providers/SessionProvider";
 
 export default async function DashboardLayout({
@@ -17,13 +16,7 @@ export default async function DashboardLayout({
 
   return (
     <SessionProvider session={session}>
-      <div className="app-layout">
-        <Sidebar />
-        <div className="app-main">
-          <Header />
-          <main className="app-content animate-fade-in">{children}</main>
-        </div>
-      </div>
+      <DashboardShell>{children}</DashboardShell>
     </SessionProvider>
   );
 }
