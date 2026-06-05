@@ -16,6 +16,7 @@ import {
   Bell,
 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
+import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -127,6 +128,7 @@ export default function Sidebar() {
             gap: "4px",
           }}
         >
+          <ThemeToggle />
           {bottomItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname.startsWith(item.href);

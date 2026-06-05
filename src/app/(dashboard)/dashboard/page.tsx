@@ -250,7 +250,7 @@ export default async function DashboardPage() {
         }}
       >
         {/* Recent tasks */}
-        <div className="card" style={{ padding: "24px" }}>
+        <div className="glass-panel" style={{ padding: "24px" }}>
           <div
             style={{
               display: "flex",
@@ -267,7 +267,7 @@ export default async function DashboardPage() {
               className="btn btn-ghost btn-sm"
               style={{ gap: "4px", fontSize: "12px" }}
             >
-              Ver todas <ArrowRight size={13} />
+              Ver Kanban <ArrowRight size={13} />
             </Link>
           </div>
 
@@ -356,7 +356,7 @@ export default async function DashboardPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           {/* Urgent tasks */}
           {urgentTasks.length > 0 && (
-            <div className="card" style={{ padding: "20px" }}>
+            <div className="glass-panel" style={{ padding: "20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
                 <Zap size={16} color="var(--red)" />
                 <h2 style={{ fontSize: "14px", fontWeight: "600", color: "var(--red)" }}>
@@ -396,9 +396,9 @@ export default async function DashboardPage() {
 
           {/* Ranking semanal */}
           {isAdmin && tasksByUser.length > 0 && (
-            <div className="card" style={{ padding: "20px" }}>
+            <div className="glass-panel" style={{ padding: "20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-                <TrendingUp size={16} color="var(--accent-hover)" />
+                <TrendingUp size={16} color="var(--accent)" />
                 <h2 style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)" }}>
                   Ranking desta semana
                 </h2>
@@ -460,7 +460,7 @@ export default async function DashboardPage() {
 
           {/* Quick actions */}
           {isAdmin && (
-            <div className="card" style={{ padding: "20px" }}>
+            <div className="glass-panel" style={{ padding: "20px" }}>
               <h2 style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)", marginBottom: "14px" }}>
                 Ações Rápidas
               </h2>

@@ -7,7 +7,7 @@ import {
   Filter,
 } from "lucide-react";
 import type { Metadata } from "next";
-import TaskList from "@/components/tasks/TaskList";
+import KanbanBoard from "@/components/tasks/KanbanBoard";
 import TaskFilters from "@/components/tasks/TaskFilters";
 import type { TaskStatus, TaskPriority } from "@prisma/client";
 
@@ -111,8 +111,10 @@ export default async function TasksPage({ searchParams }: PageProps) {
         isAdmin={isAdmin}
       />
 
-      {/* Task list */}
-      <TaskList tasks={tasks} isAdmin={isAdmin} />
+      {/* Task Kanban Board */}
+      <div style={{ flex: 1, minHeight: 0, height: "calc(100vh - 200px)" }}>
+        <KanbanBoard initialTasks={tasks as any} />
+      </div>
     </div>
   );
 }
