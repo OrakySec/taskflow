@@ -218,7 +218,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Params }) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
-  const isAdmin = session.user.role === "ADMIN";
+  const isAdmin = session.user.role === "ADMIN" || session.user.role === "MANAGER";
   if (!isAdmin) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
 
   const { id } = await params;

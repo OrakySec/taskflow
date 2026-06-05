@@ -279,53 +279,76 @@ export default function TaskDetail({
           </div>
 
           {/* Action buttons */}
-          {canChangeStatus && (
-            <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
-              {task.status === "OPEN" && (
+          <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+            {isAdmin && (
+              <>
                 <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => updateStatus("IN_PROGRESS")}
-                  disabled={statusLoading}
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => router.push(`/tasks/${task.id}/edit`)}
                 >
-                  {statusLoading ? (
-                    <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />
-                  ) : (
-                    <Play size={14} />
-                  )}
-                  Iniciar
+                  Editar
                 </button>
-              )}
-              {task.status === "IN_PROGRESS" && (
-                <>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={async () => {
+                    if (confirm("Tem certeza que deseja excluir esta tarefa?")) {
+                      const res = await fetch(`/api/tasks/${task.id}`, { method: "DELETE" });
+                      if (res.ok) router.push("/tasks");
+                    }
+                  }}
+                >
+                  Excluir
+                </button>
+              </>
+            )}
+            {canChangeStatus && (
+              <>
+                {task.status === "OPEN" && (
                   <button
-                    className="btn btn-sm"
-                    style={{
-                      background: "var(--green-subtle)",
-                      color: "var(--green)",
-                      border: "1px solid rgba(16,185,129,0.2)",
-                    }}
-                    onClick={() => updateStatus("DONE")}
+                    className="btn btn-primary btn-sm"
+                    onClick={() => updateStatus("IN_PROGRESS")}
                     disabled={statusLoading}
                   >
                     {statusLoading ? (
                       <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />
                     ) : (
-                      <CheckCircle size={14} />
+                      <Play size={14} />
                     )}
-                    Concluir
+                    Iniciar
                   </button>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => setShowFailModal(true)}
-                    disabled={statusLoading}
-                  >
-                    <XCircle size={14} />
-                    Falhou
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+                )}
+                {task.status === "IN_PROGRESS" && (
+                  <>
+                    <button
+                      className="btn btn-sm"
+                      style={{
+                        background: "var(--green-subtle)",
+                        color: "var(--green)",
+                        border: "1px solid rgba(16,185,129,0.2)",
+                      }}
+                      onClick={() => updateStatus("DONE")}
+                      disabled={statusLoading}
+                    >
+                      {statusLoading ? (
+                        <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} />
+                      ) : (
+                        <CheckCircle size={14} />
+                      )}
+                      Concluir
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => setShowFailModal(true)}
+                      disabled={statusLoading}
+                    >
+                      <XCircle size={14} />
+                      Falhou
+                    </button>
+                  </>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
