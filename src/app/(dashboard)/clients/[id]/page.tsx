@@ -36,7 +36,7 @@ export default async function ClientDetailsPage({ params }: { params: Promise<{ 
     );
   }
 
-  const openTasks = client.tasks.filter(t => t.status !== "DONE" && t.status !== "CANCELED");
+  const openTasks = client.tasks.filter(t => t.status !== "DONE" && t.status !== "FAILED");
   const completedTasks = client.tasks.filter(t => t.status === "DONE");
 
   return (
