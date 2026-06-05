@@ -15,7 +15,7 @@ export default async function ClientDetailsPage({ params }: { params: Promise<{ 
   const resolvedParams = await params;
   const clientId = resolvedParams.id;
 
-  const client = await prisma.client.findUnique({
+  const client = await prisma.client.findFirst({
     where: { id: clientId, companyId: session.user.companyId },
     include: {
       tasks: {

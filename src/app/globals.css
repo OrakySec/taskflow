@@ -5,75 +5,8 @@
 }
 
 @layer base {
-  :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 243 75% 59%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 243 75% 59%;
-
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 243 75% 59%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 243 75% 59%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-slate-50 text-slate-900 dark:bg-[#0a0a0c] dark:text-slate-100 antialiased;
   }
 }
 
@@ -93,66 +26,72 @@
 }
 
 /* Premium Utilities */
-.glass-panel {
+@utility glass-panel {
   @apply bg-white/70 dark:bg-[#0a0a0c]/50 backdrop-blur-xl border border-slate-200/50 dark:border-white/5 shadow-sm;
 }
-.glass-panel-hover {
+@utility glass-panel-hover {
   @apply hover:bg-white/90 dark:hover:bg-[#111116]/80 hover:shadow-lg hover:border-slate-300/50 dark:hover:border-white/10 transition-all duration-300;
 }
 
 /* Base UI Components replacing old CSS */
-.page-title {
+@utility page-title {
   @apply text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-1;
 }
-.page-subtitle {
+@utility page-subtitle {
   @apply text-sm text-slate-500 dark:text-slate-400;
 }
-.card {
+@utility card {
   @apply glass-panel rounded-2xl p-5;
 }
-.btn {
-  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2;
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2;
 }
-.btn-primary {
+@utility btn-primary {
   @apply bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/20 hover:shadow-indigo-600/40;
 }
-.btn-secondary {
+@utility btn-secondary {
   @apply bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/20;
 }
-.btn-ghost {
+@utility btn-ghost {
   @apply hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300;
 }
-.btn-sm {
+@utility btn-sm {
   @apply h-8 rounded-lg px-3 text-xs;
 }
-.input, .select, .textarea {
-  @apply flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400 transition-all;
+@utility input {
+  @apply flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400 transition-all;
 }
-.label {
+@utility select {
+  @apply flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400 transition-all;
+}
+@utility textarea {
+  @apply flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400 transition-all;
+}
+@utility label {
   @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-700 dark:text-slate-300 mb-2 block;
 }
-.badge {
-  @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+@utility badge {
+  @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
 }
 
 /* Priority badge colors */
-.priority-LOW { @apply text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950 dark:border-emerald-800; }
-.priority-MEDIUM { @apply text-amber-600 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950 dark:border-amber-800; }
-.priority-HIGH { @apply text-orange-600 bg-orange-50 border-orange-200 dark:text-orange-400 dark:bg-orange-950 dark:border-orange-800; }
-.priority-URGENT { @apply text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950 dark:border-red-800 animate-pulse; }
+@utility priority-LOW { @apply text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950 dark:border-emerald-800; }
+@utility priority-MEDIUM { @apply text-amber-600 bg-amber-50 border-amber-200 dark:text-amber-400 dark:bg-amber-950 dark:border-amber-800; }
+@utility priority-HIGH { @apply text-orange-600 bg-orange-50 border-orange-200 dark:text-orange-400 dark:bg-orange-950 dark:border-orange-800; }
+@utility priority-URGENT { @apply text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950 dark:border-red-800 animate-pulse; }
 
 /* Status badge colors */
-.status-OPEN { @apply text-slate-600 bg-slate-50 border-slate-200 dark:text-slate-400 dark:bg-slate-900 dark:border-slate-800; }
-.status-IN_PROGRESS { @apply text-blue-600 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950 dark:border-blue-800; }
-.status-DONE { @apply text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950 dark:border-emerald-800; }
-.status-FAILED { @apply text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950 dark:border-red-800; }
+@utility status-OPEN { @apply text-slate-600 bg-slate-50 border-slate-200 dark:text-slate-400 dark:bg-slate-900 dark:border-slate-800; }
+@utility status-IN_PROGRESS { @apply text-blue-600 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950 dark:border-blue-800; }
+@utility status-DONE { @apply text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950 dark:border-emerald-800; }
+@utility status-FAILED { @apply text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950 dark:border-red-800; }
 
-.avatar {
+@utility avatar {
   @apply flex shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 text-sm font-semibold;
   width: 36px;
   height: 36px;
 }
-.avatar-sm { width: 28px; height: 28px; font-size: 11px; }
+@utility avatar-sm { width: 28px; height: 28px; font-size: 11px; }
 
 /* Drag and Drop Helpers */
 .ring-indigo-500 {
