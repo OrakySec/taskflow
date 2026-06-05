@@ -20,6 +20,7 @@ services:
       RESEND_FROM: "TaskFlow <noreply@ykaromarques.com>"
       NEXT_PUBLIC_APP_URL: "https://taskflow.ykaromarques.com"
       CRON_SECRET: "${CRON_SECRET}"
+      AUTH_TRUST_HOST: "true"
     networks:
       - YkaroNET
     deploy:
