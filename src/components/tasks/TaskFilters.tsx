@@ -67,7 +67,7 @@ export default function TaskFilters({
       }}
     >
       {/* Search */}
-      <div style={{ position: "relative", flex: "1 1 200px", maxWidth: "300px" }}>
+      <div className="w-full-mobile" style={{ position: "relative", flex: "1 1 200px", maxWidth: "300px" }}>
         <Search
           size={14}
           style={{
@@ -95,7 +95,7 @@ export default function TaskFilters({
 
       {/* Status filter */}
       <select
-        className="select"
+        className="select w-full-mobile"
         style={{ flex: "0 0 auto", width: "auto", minWidth: "160px" }}
         value={currentParams.status || ""}
         onChange={(e) => updateFilter("status", e.target.value)}
@@ -109,7 +109,7 @@ export default function TaskFilters({
 
       {/* Priority filter */}
       <select
-        className="select"
+        className="select w-full-mobile"
         style={{ flex: "0 0 auto", width: "auto", minWidth: "180px" }}
         value={currentParams.priority || ""}
         onChange={(e) => updateFilter("priority", e.target.value)}
@@ -124,7 +124,7 @@ export default function TaskFilters({
       {/* Assigned to filter (admin only) */}
       {isAdmin && users.length > 0 && (
         <select
-          className="select"
+          className="select w-full-mobile"
           style={{ flex: "0 0 auto", width: "auto", minWidth: "180px" }}
           value={currentParams.assignedTo || ""}
           onChange={(e) => updateFilter("assignedTo", e.target.value)}
@@ -141,7 +141,7 @@ export default function TaskFilters({
       {/* Client filter */}
       {clients.length > 0 && (
         <select
-          className="select"
+          className="select w-full-mobile"
           style={{ flex: "0 0 auto", width: "auto", minWidth: "160px" }}
           value={currentParams.clientId || ""}
           onChange={(e) => updateFilter("clientId", e.target.value)}
@@ -158,9 +158,9 @@ export default function TaskFilters({
       {/* Clear filters */}
       {hasFilters && (
         <button
-          className="btn btn-ghost btn-sm"
+          className="btn btn-ghost btn-sm w-full-mobile"
           onClick={clearAll}
-          style={{ gap: "4px", color: "var(--text-muted)" }}
+          style={{ gap: "4px", color: "var(--text-muted)", justifyContent: "center" }}
         >
           <X size={13} />
           Limpar

@@ -601,6 +601,11 @@ textarea.input {
 }
 
 /* ── Responsividade ───────────────────────────────────── */
+.flex-col-mobile {
+  display: flex;
+}
+.w-full-mobile {}
+
 @media (max-width: 768px) {
   .app-sidebar {
     transform: translateX(-100%);
@@ -609,4 +614,15 @@ textarea.input {
   .app-sidebar.open { transform: translateX(0); }
   .app-main { margin-left: 0; }
   .app-content { padding: 16px; }
+  
+  .flex-col-mobile {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .w-full-mobile {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
 }

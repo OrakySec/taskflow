@@ -79,8 +79,8 @@ export default async function TasksPage({ searchParams }: PageProps) {
     <div>
       {/* Header */}
       <div
+        className="flex-col-mobile"
         style={{
-          display: "flex",
           alignItems: "flex-start",
           justifyContent: "space-between",
           marginBottom: "24px",
@@ -96,7 +96,7 @@ export default async function TasksPage({ searchParams }: PageProps) {
           </p>
         </div>
         {isAdmin && (
-          <Link href="/tasks/new" className="btn btn-primary">
+          <Link href="/tasks/new" className="btn btn-primary w-full-mobile" style={{ justifyContent: "center" }}>
             <Plus size={16} />
             Nova Tarefa
           </Link>
