@@ -133,51 +133,51 @@ export default async function DashboardPage() {
       {/* Bento Grid Top Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card glass-panel-hover group relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-indigo-500/20" />
-          <div className="flex justify-between items-start mb-4">
+          <div className="absolute top-[-50px] right-[-50px] w-40 h-40 rounded-full pointer-events-none transition-all duration-500 opacity-50 group-hover:opacity-100" style={{ background: "radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%)" }} />
+          <div className="flex justify-between items-start mb-4 relative z-10">
             <div className="p-3 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl">
               <CheckSquare size={24} />
             </div>
             <span className="badge bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">Abertas</span>
           </div>
-          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.totalOpen}</div>
-          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Tarefas esperando início</div>
+          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight relative z-10">{stats.totalOpen}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 relative z-10">Tarefas esperando início</div>
         </div>
 
         <div className="card glass-panel-hover group relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-blue-500/20" />
-          <div className="flex justify-between items-start mb-4">
+          <div className="absolute top-[-50px] right-[-50px] w-40 h-40 rounded-full pointer-events-none transition-all duration-500 opacity-50 group-hover:opacity-100" style={{ background: "radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%)" }} />
+          <div className="flex justify-between items-start mb-4 relative z-10">
             <div className="p-3 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl">
               <Clock size={24} />
             </div>
             <span className="badge bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">Ativas</span>
           </div>
-          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.totalInProgress}</div>
-          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Sendo feitas agora</div>
+          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight relative z-10">{stats.totalInProgress}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 relative z-10">Sendo feitas agora</div>
         </div>
 
         <div className="card glass-panel-hover group relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-emerald-500/20" />
-          <div className="flex justify-between items-start mb-4">
+          <div className="absolute top-[-50px] right-[-50px] w-40 h-40 rounded-full pointer-events-none transition-all duration-500 opacity-50 group-hover:opacity-100" style={{ background: "radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%)" }} />
+          <div className="flex justify-between items-start mb-4 relative z-10">
             <div className="p-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-2xl">
               <TrendingUp size={24} />
             </div>
             <span className="badge bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">Hoje</span>
           </div>
-          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.doneToday}</div>
-          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Concluídas hoje</div>
+          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight relative z-10">{stats.doneToday}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 relative z-10">Concluídas hoje</div>
         </div>
 
         <div className={`card glass-panel-hover group relative overflow-hidden ${stats.overdue > 0 ? "border-red-500/30 dark:border-red-500/30" : ""}`}>
-          <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl -mr-10 -mt-10 transition-all ${stats.overdue > 0 ? "bg-red-500/10 group-hover:bg-red-500/20" : "bg-slate-500/10"}`} />
-          <div className="flex justify-between items-start mb-4">
+          <div className={`absolute top-[-50px] right-[-50px] w-40 h-40 rounded-full pointer-events-none transition-all duration-500 opacity-50 group-hover:opacity-100`} style={{ background: stats.overdue > 0 ? "radial-gradient(circle, rgba(239, 68, 68, 0.25) 0%, transparent 70%)" : "radial-gradient(circle, rgba(100, 116, 139, 0.15) 0%, transparent 70%)" }} />
+          <div className="flex justify-between items-start mb-4 relative z-10">
             <div className={`p-3 rounded-2xl ${stats.overdue > 0 ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-slate-500/10 text-slate-600 dark:text-slate-400"}`}>
               <AlertTriangle size={24} />
             </div>
             {stats.overdue > 0 && <span className="badge bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 animate-pulse">Atenção</span>}
           </div>
-          <div className={`text-4xl font-black tracking-tight ${stats.overdue > 0 ? "text-red-600 dark:text-red-400" : "text-slate-900 dark:text-white"}`}>{stats.overdue}</div>
-          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Tarefas atrasadas</div>
+          <div className={`text-4xl font-black tracking-tight relative z-10 ${stats.overdue > 0 ? "text-red-600 dark:text-red-400" : "text-slate-900 dark:text-white"}`}>{stats.overdue}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1 relative z-10">Tarefas atrasadas</div>
         </div>
       </div>
 
@@ -317,16 +317,14 @@ export default async function DashboardPage() {
                       </div>
                       <div className="h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                         <div
-                          className="h-full rounded-full transition-all duration-1000 ease-out"
+                          className={`h-full rounded-full transition-all duration-1000 ease-out bg-gradient-to-r ${
+                            index === 0 ? "from-indigo-500 to-purple-500" :
+                            index === 1 ? "from-blue-500 to-indigo-500" :
+                            index === 2 ? "from-emerald-500 to-blue-500" :
+                            "from-slate-400 to-slate-500"
+                          }`}
                           style={{
-                            width: `${pct}%`,
-                            background: index === 0 
-                              ? "linear-gradient(90deg, #6366f1, #a855f7)" 
-                              : index === 1
-                                ? "linear-gradient(90deg, #3b82f6, #6366f1)"
-                                : index === 2
-                                  ? "linear-gradient(90deg, #10b981, #3b82f6)"
-                                  : "var(--tw-colors-slate-400)",
+                            width: `${pct}%`
                           }}
                         />
                       </div>

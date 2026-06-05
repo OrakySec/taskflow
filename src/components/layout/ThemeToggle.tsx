@@ -14,9 +14,9 @@ export default function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button className="nav-item" style={{ width: "100%", justifyContent: "space-between", background: "transparent" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{ width: "16px", height: "16px", opacity: 0.5 }} /> Tema
+      <button className="flex items-center justify-between w-full p-2.5 rounded-lg text-sm font-medium opacity-50 cursor-not-allowed">
+        <div className="flex items-center gap-3">
+          <div className="w-[18px] h-[18px]" /> Tema
         </div>
       </button>
     );
@@ -26,38 +26,17 @@ export default function ThemeToggle() {
 
   return (
     <button
-      className="nav-item"
+      className="flex items-center justify-between w-full p-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 group"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      style={{ width: "100%", justifyContent: "space-between", background: "transparent", border: "none" }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        {isDark ? <Sun size={16} /> : <Moon size={16} />}
-        {isDark ? "Modo Claro" : "Modo Escuro"}
+      <div className="flex items-center gap-3">
+        {isDark ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} className="text-indigo-500" />}
+        <span>{isDark ? "Modo Claro" : "Modo Escuro"}</span>
       </div>
-      <div
-        style={{
-          width: "36px",
-          height: "20px",
-          borderRadius: "10px",
-          background: isDark ? "var(--accent)" : "var(--bg-secondary)",
-          border: "1px solid var(--border)",
-          position: "relative",
-          transition: "all 0.3s ease",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: "2px",
-            left: isDark ? "18px" : "2px",
-            width: "14px",
-            height: "14px",
-            borderRadius: "50%",
-            background: "white",
-            transition: "all 0.3s ease",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-          }}
-        />
+      
+      {/* Modern Toggle Switch side-by-side */}
+      <div className={`w-9 h-5 flex items-center rounded-full p-1 transition-colors duration-300 ${isDark ? "bg-indigo-500" : "bg-slate-300 dark:bg-slate-600"}`}>
+        <div className={`bg-white w-3 h-3 rounded-full shadow-sm transform transition-transform duration-300 ${isDark ? "translate-x-4" : "translate-x-0"}`} />
       </div>
     </button>
   );
