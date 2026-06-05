@@ -48,7 +48,7 @@ export default function Sidebar({ isOpen, isCollapsed, setIsOpen }: SidebarProps
         bg-white/70 dark:bg-[#060609]/80 backdrop-blur-2xl
         border-r border-slate-200/50 dark:border-white/5
         transition-all duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
         ${isCollapsed ? "hidden" : "w-64 opacity-100 lg:static"}
       `}
     >
