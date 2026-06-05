@@ -11,6 +11,8 @@ import {
   Briefcase,
   ArrowRight,
   Zap,
+  Activity,
+  Star
 } from "lucide-react";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -55,7 +57,7 @@ async function getDashboardData(companyId: string) {
     prisma.task.findMany({
       where: { companyId },
       orderBy: { createdAt: "desc" },
-      take: 5,
+      take: 6,
       include: {
         assignedTo: { select: { name: true } },
         client: { select: { name: true } },
@@ -68,7 +70,7 @@ async function getDashboardData(companyId: string) {
         status: { in: ["OPEN", "IN_PROGRESS"] },
       },
       orderBy: { createdAt: "desc" },
-      take: 3,
+      take: 4,
       include: {
         assignedTo: { select: { name: true } },
       },
@@ -117,274 +119,165 @@ export default async function DashboardPage() {
   const isAdmin = session.user.role === "ADMIN" || session.user.role === "MANAGER";
 
   return (
-    <div>
+    <div className="flex flex-col gap-8 pb-10">
       {/* Page header */}
-      <div style={{ marginBottom: "32px" }}>
-        <h1 className="page-title">
+      <div className="flex flex-col gap-2">
+        <h1 className="page-title text-3xl">
           Bom dia, {session.user.name?.split(" ")[0]}! 👋
         </h1>
-        <p className="page-subtitle">
-          Aqui está um resumo do que está acontecendo hoje.
+        <p className="page-subtitle text-base">
+          Aqui está um resumo inteligente do seu fluxo de trabalho hoje.
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "16px",
-          marginBottom: "32px",
-        }}
-      >
-        <div className="stat-card stat-card-accent">
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
-                Tarefas Abertas
-              </div>
-              <div style={{ fontSize: "36px", fontWeight: "800", color: "var(--text-primary)", letterSpacing: "-1px" }}>
-                {stats.totalOpen}
-              </div>
+      {/* Bento Grid Top Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="card glass-panel-hover group relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-indigo-500/20" />
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl">
+              <CheckSquare size={24} />
             </div>
-            <div style={{ padding: "10px", background: "var(--accent-subtle)", borderRadius: "10px" }}>
-              <CheckSquare size={20} color="var(--accent-hover)" />
-            </div>
+            <span className="badge bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300">Abertas</span>
           </div>
+          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.totalOpen}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Tarefas esperando início</div>
         </div>
 
-        <div className="stat-card" style={{ borderTop: "2px solid var(--blue)" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
-                Em Andamento
-              </div>
-              <div style={{ fontSize: "36px", fontWeight: "800", color: "var(--text-primary)", letterSpacing: "-1px" }}>
-                {stats.totalInProgress}
-              </div>
+        <div className="card glass-panel-hover group relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-blue-500/20" />
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-2xl">
+              <Clock size={24} />
             </div>
-            <div style={{ padding: "10px", background: "var(--blue-subtle)", borderRadius: "10px" }}>
-              <Clock size={20} color="var(--blue)" />
-            </div>
+            <span className="badge bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">Ativas</span>
           </div>
+          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.totalInProgress}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Sendo feitas agora</div>
         </div>
 
-        <div className="stat-card stat-card-green">
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
-                Concluídas Hoje
-              </div>
-              <div style={{ fontSize: "36px", fontWeight: "800", color: "var(--text-primary)", letterSpacing: "-1px" }}>
-                {stats.doneToday}
-              </div>
+        <div className="card glass-panel-hover group relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-emerald-500/20" />
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-2xl">
+              <TrendingUp size={24} />
             </div>
-            <div style={{ padding: "10px", background: "var(--green-subtle)", borderRadius: "10px" }}>
-              <TrendingUp size={20} color="var(--green)" />
-            </div>
+            <span className="badge bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">Hoje</span>
           </div>
+          <div className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{stats.doneToday}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Concluídas hoje</div>
         </div>
 
-        {stats.overdue > 0 && (
-          <div className="stat-card stat-card-red">
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-              <div>
-                <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
-                  Atrasadas ⚠️
-                </div>
-                <div style={{ fontSize: "36px", fontWeight: "800", color: "var(--red)", letterSpacing: "-1px" }}>
-                  {stats.overdue}
-                </div>
-              </div>
-              <div style={{ padding: "10px", background: "var(--red-subtle)", borderRadius: "10px" }}>
-                <AlertTriangle size={20} color="var(--red)" />
-              </div>
+        <div className={`card glass-panel-hover group relative overflow-hidden ${stats.overdue > 0 ? "border-red-500/30 dark:border-red-500/30" : ""}`}>
+          <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl -mr-10 -mt-10 transition-all ${stats.overdue > 0 ? "bg-red-500/10 group-hover:bg-red-500/20" : "bg-slate-500/10"}`} />
+          <div className="flex justify-between items-start mb-4">
+            <div className={`p-3 rounded-2xl ${stats.overdue > 0 ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-slate-500/10 text-slate-600 dark:text-slate-400"}`}>
+              <AlertTriangle size={24} />
             </div>
+            {stats.overdue > 0 && <span className="badge bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 animate-pulse">Atenção</span>}
           </div>
-        )}
-
-        {isAdmin && (
-          <>
-            <div className="stat-card">
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                <div>
-                  <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
-                    Colaboradores
-                  </div>
-                  <div style={{ fontSize: "36px", fontWeight: "800", color: "var(--text-primary)", letterSpacing: "-1px" }}>
-                    {stats.totalUsers}
-                  </div>
-                </div>
-                <div style={{ padding: "10px", background: "var(--accent-subtle)", borderRadius: "10px" }}>
-                  <Users size={20} color="var(--accent-hover)" />
-                </div>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                <div>
-                  <div style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "8px" }}>
-                    Clientes
-                  </div>
-                  <div style={{ fontSize: "36px", fontWeight: "800", color: "var(--text-primary)", letterSpacing: "-1px" }}>
-                    {stats.totalClients}
-                  </div>
-                </div>
-                <div style={{ padding: "10px", background: "var(--green-subtle)", borderRadius: "10px" }}>
-                  <Briefcase size={20} color="var(--green)" />
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+          <div className={`text-4xl font-black tracking-tight ${stats.overdue > 0 ? "text-red-600 dark:text-red-400" : "text-slate-900 dark:text-white"}`}>{stats.overdue}</div>
+          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Tarefas atrasadas</div>
+        </div>
       </div>
 
-      {/* Main grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 340px",
-          gap: "24px",
-          alignItems: "start",
-        }}
-      >
-        {/* Recent tasks */}
-        <div className="glass-panel" style={{ padding: "24px" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "20px",
-            }}
-          >
-            <h2 style={{ fontSize: "15px", fontWeight: "600", color: "var(--text-primary)" }}>
-              Tarefas Recentes
-            </h2>
-            <Link
-              href="/tasks"
-              className="btn btn-ghost btn-sm"
-              style={{ gap: "4px", fontSize: "12px" }}
-            >
-              Ver Kanban <ArrowRight size={13} />
-            </Link>
-          </div>
-
-          {recentTasks.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">
-                <CheckSquare size={28} />
+      {/* Main Bento Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Left Column: Recent Activity (Spans 2 cols on desktop) */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          <div className="card glass-panel flex-1 flex flex-col p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
+                  <Activity size={20} />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Fluxo Recente</h2>
               </div>
-              <p style={{ fontSize: "14px", marginBottom: "12px" }}>
-                Nenhuma tarefa ainda
-              </p>
-              <Link href="/tasks/new" className="btn btn-primary btn-sm">
-                Criar primeira tarefa
+              <Link href="/tasks" className="btn btn-ghost btn-sm group">
+                Ver Kanban <ArrowRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {recentTasks.map((task) => (
-                <Link
-                  key={task.id}
-                  href={`/tasks/${task.id}`}
-                  style={{ textDecoration: "none" }}
-                >
-                  <div
-                    className={`task-card task-card-${task.priority.toLowerCase()}`}
+
+            {recentTasks.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
+                <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center text-slate-400 mb-4">
+                  <CheckSquare size={32} />
+                </div>
+                <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-1">Tudo limpo por aqui! ✨</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Nenhuma tarefa foi criada no sistema ainda.</p>
+                <Link href="/tasks/new" className="btn btn-primary">
+                  Criar Primeira Tarefa
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {recentTasks.map((task) => (
+                  <Link
+                    key={task.id}
+                    href={`/tasks/${task.id}`}
+                    className="group block"
                   >
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            fontSize: "14px",
-                            fontWeight: "500",
-                            color: "var(--text-primary)",
-                            marginBottom: "6px",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
+                    <div className="p-4 rounded-2xl bg-slate-50/50 hover:bg-slate-100 dark:bg-white/[0.02] dark:hover:bg-white/[0.04] border border-slate-100 hover:border-slate-200 dark:border-white/5 dark:hover:border-white/10 transition-all duration-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           {task.title}
-                        </div>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <span
-                            className={`badge priority-${task.priority}`}
-                          >
-                            {PRIORITY_LABELS[task.priority]}
-                          </span>
-                          <span
-                            className={`badge status-${task.status}`}
-                          >
-                            {STATUS_LABELS[task.status]}
-                          </span>
+                        </h4>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`badge priority-${task.priority}`}>{PRIORITY_LABELS[task.priority]}</span>
+                          <span className={`badge status-${task.status}`}>{STATUS_LABELS[task.status]}</span>
                           {task.client && (
-                            <span style={{ fontSize: "12px", color: "var(--text-muted)" }}>
-                              {task.client.name}
+                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                              <Briefcase size={12} /> {task.client.name}
                             </span>
                           )}
                         </div>
                       </div>
-                      <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      
+                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1 shrink-0">
                         {task.assignedTo && (
-                          <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>
-                            {task.assignedTo.name}
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
+                            <div className="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[9px] font-bold">
+                              {task.assignedTo.name.charAt(0)}
+                            </div>
+                            {task.assignedTo.name.split(" ")[0]}
                           </div>
                         )}
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
                           {formatRelativeTime(task.createdAt)}
-                        </div>
+                        </span>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Right column */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          {/* Urgent tasks */}
+        {/* Right Column: Alerts & Rankings */}
+        <div className="flex flex-col gap-6">
+          
+          {/* Urgent Tasks Bento Box */}
           {urgentTasks.length > 0 && (
-            <div className="glass-panel" style={{ padding: "20px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-                <Zap size={16} color="var(--red)" />
-                <h2 style={{ fontSize: "14px", fontWeight: "600", color: "var(--red)" }}>
-                  Urgentes
-                </h2>
+            <div className="card glass-panel p-6 bg-gradient-to-b from-white to-red-50/30 dark:from-[#0f0f15] dark:to-red-950/10 border-red-100 dark:border-red-900/30">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="p-2 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl animate-pulse">
+                  <Zap size={18} />
+                </div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Fogo Cruzado 🔥</h2>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              
+              <div className="flex flex-col gap-3">
                 {urgentTasks.map((task) => (
-                  <Link
-                    key={task.id}
-                    href={`/tasks/${task.id}`}
-                    style={{ textDecoration: "none" }}
-                  >
-                    <div
-                      style={{
-                        padding: "10px 12px",
-                        borderRadius: "8px",
-                        background: "var(--red-subtle)",
-                        border: "1px solid rgba(239,68,68,0.2)",
-                        transition: "all 0.15s",
-                      }}
-                    >
-                      <div style={{ fontSize: "13px", fontWeight: "500", color: "var(--text-primary)", marginBottom: "4px" }}>
+                  <Link key={task.id} href={`/tasks/${task.id}`}>
+                    <div className="p-3 rounded-xl bg-red-50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10 hover:border-red-300 dark:hover:border-red-500/30 transition-all group">
+                      <div className="text-sm font-semibold text-slate-900 dark:text-white mb-1 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors line-clamp-1">
                         {task.title}
                       </div>
                       {task.assignedTo && (
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
-                          {task.assignedTo.name}
+                        <div className="text-xs text-slate-500 dark:text-slate-400">
+                          Com: <span className="font-medium text-slate-700 dark:text-slate-300">{task.assignedTo.name}</span>
                         </div>
                       )}
                     </div>
@@ -394,60 +287,46 @@ export default async function DashboardPage() {
             </div>
           )}
 
-          {/* Ranking semanal */}
+          {/* Ranking Bento Box */}
           {isAdmin && tasksByUser.length > 0 && (
-            <div className="glass-panel" style={{ padding: "20px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-                <TrendingUp size={16} color="var(--accent)" />
-                <h2 style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)" }}>
-                  Ranking desta semana
-                </h2>
+            <div className="card glass-panel p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl">
+                  <Star size={18} />
+                </div>
+                <h2 className="text-base font-bold text-slate-900 dark:text-white">Top Produtividade da Semana</h2>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              
+              <div className="flex flex-col gap-5">
                 {tasksByUser.map((user, index) => {
                   const medals = ["🥇", "🥈", "🥉"];
-                  const medal = medals[index] ?? `${index + 1}`;
+                  const medal = medals[index] ?? `${index + 1}º`;
                   const max = tasksByUser[0]?._count.assignedTasks || 1;
-                  const pct = (user._count.assignedTasks / max) * 100;
+                  const pct = Math.max((user._count.assignedTasks / max) * 100, 5); // min 5% for visual
 
                   return (
-                    <div key={user.id}>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                          <span style={{ fontSize: "14px" }}>{medal}</span>
-                          <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
-                            {user.name}
-                          </span>
+                    <div key={user.id} className="flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-sm font-medium">
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 text-center">{medal}</span>
+                          <span className="text-slate-700 dark:text-slate-300">{user.name}</span>
                         </div>
-                        <span style={{ fontSize: "13px", fontWeight: "600", color: "var(--text-primary)" }}>
+                        <span className="text-slate-900 dark:text-white font-bold bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded-md">
                           {user._count.assignedTasks}
                         </span>
                       </div>
-                      <div
-                        style={{
-                          height: "4px",
-                          background: "var(--bg-secondary)",
-                          borderRadius: "2px",
-                          overflow: "hidden",
-                        }}
-                      >
+                      <div className="h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                         <div
+                          className="h-full rounded-full transition-all duration-1000 ease-out"
                           style={{
-                            height: "100%",
                             width: `${pct}%`,
-                            background:
-                              index === 0
-                                ? "linear-gradient(90deg, var(--accent), var(--accent-hover))"
-                                : "var(--border-hover)",
-                            borderRadius: "2px",
-                            transition: "width 0.5s ease",
+                            background: index === 0 
+                              ? "linear-gradient(90deg, #6366f1, #a855f7)" 
+                              : index === 1
+                                ? "linear-gradient(90deg, #3b82f6, #6366f1)"
+                                : index === 2
+                                  ? "linear-gradient(90deg, #10b981, #3b82f6)"
+                                  : "var(--tw-colors-slate-400)",
                           }}
                         />
                       </div>
@@ -458,22 +337,18 @@ export default async function DashboardPage() {
             </div>
           )}
 
-          {/* Quick actions */}
+          {/* Admin Stats Bento */}
           {isAdmin && (
-            <div className="glass-panel" style={{ padding: "20px" }}>
-              <h2 style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)", marginBottom: "14px" }}>
-                Ações Rápidas
-              </h2>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <Link href="/tasks/new" className="btn btn-primary btn-sm" style={{ justifyContent: "flex-start" }}>
-                  <CheckSquare size={15} /> Nova Tarefa
-                </Link>
-                <Link href="/clients/new" className="btn btn-secondary btn-sm" style={{ justifyContent: "flex-start" }}>
-                  <Briefcase size={15} /> Novo Cliente
-                </Link>
-                <Link href="/users/invite" className="btn btn-secondary btn-sm" style={{ justifyContent: "flex-start" }}>
-                  <Users size={15} /> Convidar Colaborador
-                </Link>
+            <div className="grid grid-cols-2 gap-4 mt-auto">
+              <div className="card glass-panel p-4 flex flex-col items-center justify-center text-center gap-2">
+                <Users size={20} className="text-indigo-500" />
+                <div className="text-2xl font-black text-slate-900 dark:text-white">{stats.totalUsers}</div>
+                <div className="text-xs font-medium text-slate-500">Membros</div>
+              </div>
+              <div className="card glass-panel p-4 flex flex-col items-center justify-center text-center gap-2">
+                <Briefcase size={20} className="text-emerald-500" />
+                <div className="text-2xl font-black text-slate-900 dark:text-white">{stats.totalClients}</div>
+                <div className="text-xs font-medium text-slate-500">Clientes</div>
               </div>
             </div>
           )}

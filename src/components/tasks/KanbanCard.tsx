@@ -50,11 +50,11 @@ export default function KanbanCard({ task }: KanbanCardProps) {
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className={`card glass-panel-hover relative cursor-grab mb-3 flex flex-col border-l-[3px] ${
+      className={`card glass-panel-hover relative cursor-grab mb-3 flex flex-col border-l-[4px] hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 ${
         task.priority === "URGENT" ? "border-l-red-500" :
         task.priority === "HIGH" ? "border-l-orange-500" :
         task.priority === "MEDIUM" ? "border-l-amber-500" : "border-l-emerald-500"
-      } ${isDragging ? "ring-2 ring-indigo-500 shadow-xl opacity-40" : "opacity-100"}`}
+      } ${isDragging ? "ring-2 ring-indigo-500 shadow-2xl scale-105 z-50 opacity-80 cursor-grabbing" : "opacity-100 hover:shadow-xl"}`}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
