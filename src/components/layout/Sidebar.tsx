@@ -49,7 +49,7 @@ export default function Sidebar({ isOpen, isCollapsed, setIsOpen }: SidebarProps
         border-r border-slate-200/50 dark:border-white/5
         transition-all duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        ${isCollapsed ? "hidden" : "w-64 opacity-100 lg:static"}
+        ${isCollapsed ? "max-lg:flex lg:hidden" : "w-64 opacity-100 lg:static"}
       `}
     >
       <div className="flex flex-col h-full p-4 overflow-y-auto custom-scrollbar overflow-x-hidden">
