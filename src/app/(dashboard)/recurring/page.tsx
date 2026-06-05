@@ -37,8 +37,8 @@ export default async function RecurringPage() {
   const renderCard = (task: any) => (
     <div key={task.id} className={`card glass-panel-hover p-4 relative group ${!task.isActive ? "opacity-60 grayscale-[0.5]" : ""}`}>
       <div className="flex justify-between items-start mb-2">
-        <div className={`badge ${getPriorityClass(task.priority)}`}>
-          {PRIORITY_LABELS[task.priority]}
+        <div className={`badge ${getPriorityClass(task.priority as any)}`}>
+          {PRIORITY_LABELS[task.priority as keyof typeof PRIORITY_LABELS]}
         </div>
         {isAdmin && (
           <Link href={`/recurring/${task.id}/edit`} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-md text-slate-400 hover:text-indigo-500">
