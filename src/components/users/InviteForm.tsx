@@ -7,7 +7,7 @@ import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 export default function InviteForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [inviteToken, setInviteToken] = useState("");
   const [error, setError] = useState("");
   const [form, setForm] = useState({ email: "", role: "COLLABORATOR" });
 
@@ -22,21 +22,33 @@ export default function InviteForm() {
     });
     const data = await res.json();
     if (!res.ok) { setError(data.error || "Erro ao enviar convite."); setLoading(false); return; }
-    setSent(true);
+    setInviteToken(data.token);
     setLoading(false);
   }
 
-  if (sent) return (
-    <div className="card" style={{ padding: "40px", textAlign: "center" }}>
-      <CheckCircle size={48} color="var(--green)" style={{ marginBottom: "16px" }} />
-      <h2 style={{ fontSize: "18px", fontWeight: "700", color: "var(--text-primary)", marginBottom: "8px" }}>Convite enviado!</h2>
-      <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "24px" }}>Um e-mail de convite foi enviado para <strong style={{ color: "var(--text-secondary)" }}>{form.email}</strong>.</p>
-      <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-        <button className="btn btn-secondary" onClick={() => { setSent(false); setForm({ email: "", role: "COLLABORATOR" }); }}>Enviar outro</button>
-        <Link href="/users" className="btn btn-primary">Ver equipe</Link>
+  if (inviteToken) {
+    const inviteUrl = `${window.location.origin}/invite/${inviteToken}`;
+    return (
+      <div className="card" style={{ padding: "40px", textAlign: "center" }}>
+        <CheckCircle size={48} color="var(--green)" style={{ marginBottom: "16px" }} />
+        <h2 style={{ fontSize: "18px", fontWeight: "700", color: "var(--text-primary)", marginBottom: "8px" }}>Convite gerado!</h2>
+        <p style={{ fontSize: "13px", color: "var(--text-muted)", marginBottom: "24px" }}>Tentamos enviar um e-mail para <strong style={{ color: "var(--text-secondary)" }}>{form.email}</strong>.</p>
+        
+        <div style={{ background: "var(--bg-secondary)", border: "1px solid var(--border)", borderRadius: "8px", padding: "16px", marginBottom: "24px", textAlign: "left" }}>
+          <p style={{ fontSize: "13px", fontWeight: "500", color: "var(--text-primary)", marginBottom: "8px" }}>Caso o e-mail não chegue, copie o link abaixo e envie para a pessoa:</p>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input type="text" readOnly value={inviteUrl} className="input" style={{ flex: 1, fontFamily: "monospace", fontSize: "12px", background: "var(--bg-primary)" }} />
+            <button className="btn btn-secondary" onClick={() => navigator.clipboard.writeText(inviteUrl)}>Copiar</button>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+          <button className="btn btn-secondary" onClick={() => { setInviteToken(""); setForm({ email: "", role: "COLLABORATOR" }); }}>Enviar outro</button>
+          <Link href="/users" className="btn btn-primary">Ver equipe</Link>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit}>

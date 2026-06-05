@@ -82,5 +82,5 @@ export async function POST(req: NextRequest) {
     inviterName: session.user.name || "Admin",
   });
 
-  return NextResponse.json({ message: "Convite enviado!", inviteId: invite.id }, { status: 201 });
+  return NextResponse.json({ message: "Convite enviado!", inviteId: invite.id, token: invite.token }, { status: 201 });
 }
