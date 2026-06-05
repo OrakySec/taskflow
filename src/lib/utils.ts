@@ -87,3 +87,7 @@ export const ROLE_LABELS = {
   MANAGER: "Gerente",
   COLLABORATOR: "Colaborador",
 };
+
+export function getPriorityClass(priority: string): string {
+  return `priority-${priority}`;
+}
