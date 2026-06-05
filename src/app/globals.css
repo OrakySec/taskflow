@@ -101,9 +101,9 @@
 /* Responsive Overrides (from old implementation) */
 @media (max-width: 768px) {
   .flex-col-mobile {
-    @apply flex-col items-stretch !important;
+    @apply !flex-col !items-stretch;
   }
   .w-full-mobile {
-    @apply w-full max-w-full min-w-0 flex-1 !important;
+    @apply !w-full !max-w-full !min-w-0 !flex-1;
   }
 }

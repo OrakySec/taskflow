@@ -66,7 +66,7 @@ export default function TaskFilters({
         />
         <input
           type="text"
-          className="input"
+          className="input pl-9"
           placeholder="Buscar tarefa..."
           defaultValue={currentParams.q || ""}
           onChange={(e) => {
@@ -75,7 +75,6 @@ export default function TaskFilters({
               updateFilter("q", e.target.value);
             }, 400);
           }}
-          className="input pl-9"
         />
       </div>
 
