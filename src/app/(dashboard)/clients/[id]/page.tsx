@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Briefcase, Mail, Phone, Calendar, CheckSquare, Clock, AlertCircle } from "lucide-react";
+import { ArrowLeft, Briefcase, Mail, Phone, Calendar, CheckSquare, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import type { Metadata } from "next";
 
