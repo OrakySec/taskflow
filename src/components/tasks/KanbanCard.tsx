@@ -48,7 +48,6 @@ export default function KanbanCard({ task }: KanbanCardProps) {
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...attributes}
       {...listeners}
       className={`card ${isDragging ? "ring-2 ring-indigo-500 shadow-xl" : ""}`}
