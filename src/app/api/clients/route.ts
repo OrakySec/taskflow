@@ -5,9 +5,9 @@ import { z } from "zod";
 
 const schema = z.object({
   name: z.string().min(2),
-  email: z.string().email().optional().nullable(),
-  phone: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
+  email: z.union([z.string().email(), z.literal(""), z.null()]).optional(),
+  phone: z.union([z.string(), z.literal(""), z.null()]).optional(),
+  notes: z.union([z.string(), z.literal(""), z.null()]).optional(),
 });
 
 export async function GET(req: NextRequest) {
