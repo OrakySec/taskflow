@@ -45,12 +45,11 @@ export default function Sidebar({ isOpen, isCollapsed, setIsOpen }: SidebarProps
     <aside
       className={`
         fixed inset-y-0 left-0 z-50 flex flex-col
-        bg-white/70 dark:bg-[#0a0a0c]/80 backdrop-blur-2xl
+        bg-white/70 dark:bg-[#060609]/80 backdrop-blur-2xl
         border-r border-slate-200/50 dark:border-white/5
         transition-all duration-300 ease-in-out
-        lg:static lg:translate-x-0
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        ${isCollapsed ? "w-20" : "w-64"}
+        ${isCollapsed ? "w-0 opacity-0 overflow-hidden lg:-ml-[256px]" : "w-64 opacity-100 lg:static"}
       `}
     >
       <div className="flex flex-col h-full p-4 overflow-y-auto custom-scrollbar overflow-x-hidden">

@@ -57,7 +57,7 @@ export default function TaskFilters({
   const hasFilters = Object.values(currentParams).some(Boolean);
 
   return (
-    <div className="flex flex-wrap gap-3 mb-6 items-center">
+    <div className="flex flex-nowrap gap-3 mb-6 items-center overflow-x-auto pb-2 custom-scrollbar w-full">
       {/* Search */}
       <div className="relative flex-1 min-w-[200px] max-w-[300px] w-full md:w-auto">
         <Search

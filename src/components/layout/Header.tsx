@@ -34,7 +34,7 @@ export default function Header({ title, toggleMobileSidebar, toggleDesktopSideba
           className="hidden lg:flex p-2 -ml-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
           aria-label="Toggle Sidebar"
         >
-          {isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+          {isCollapsed ? <Menu size={20} /> : <PanelLeftClose size={20} />}
         </button>
 
         {/* Title */}
