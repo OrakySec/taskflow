@@ -9,6 +9,7 @@ import {
   Users,
   Briefcase,
   LayoutTemplate,
+  RefreshCw,
   Settings,
   LogOut,
   Zap,
@@ -21,6 +22,7 @@ const navItems = [
   { href: "/tasks", label: "Tarefas", icon: CheckSquare },
   { href: "/clients", label: "Clientes", icon: Briefcase },
   { href: "/templates", label: "Templates", icon: LayoutTemplate },
+  { href: "/recurring", label: "Recorrentes", icon: RefreshCw },
   { href: "/users", label: "Equipe", icon: Users },
 ];
 
