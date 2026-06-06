@@ -58,7 +58,12 @@ export async function GET(request: Request) {
         assignedTo: {
           select: { name: true, avatar: true }
         },
-        attachments: true
+        attachments: true,
+        comments: {
+          where: { content: { startsWith: '❌ **Motivo da falha:**' } },
+          orderBy: { createdAt: 'desc' },
+          take: 1
+        }
       }
     });
 

@@ -73,7 +73,7 @@ export default async function TasksPage({ searchParams }: PageProps) {
     }),
     isAdmin
       ? prisma.user.findMany({
-          where: { companyId: session.user.companyId, isActive: true },
+          where: { companyId: session.user.companyId, isActive: true, role: { not: "CLIENT" } },
           select: { id: true, name: true },
           orderBy: { name: "asc" },
         })

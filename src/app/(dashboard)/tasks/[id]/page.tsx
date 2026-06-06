@@ -52,7 +52,7 @@ export default async function TaskDetailPage({ params }: { params: Params }) {
 
   // Busca usuários da empresa para @menção
   const companyUsers = await prisma.user.findMany({
-    where: { companyId: session.user.companyId, isActive: true },
+    where: { companyId: session.user.companyId, isActive: true, role: { not: "CLIENT" } },
     select: { id: true, name: true, avatar: true },
     orderBy: { name: "asc" },
   });

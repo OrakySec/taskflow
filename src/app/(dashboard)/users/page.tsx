@@ -16,7 +16,7 @@ export default async function UsersPage() {
   if (!isAdmin) redirect("/dashboard");
 
   const users = await prisma.user.findMany({
-    where: { companyId: session.user.companyId },
+    where: { companyId: session.user.companyId, role: { not: "CLIENT" } },
     select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true, avatar: true, _count: { select: { assignedTasks: true } } },
     orderBy: { name: "asc" },
   });

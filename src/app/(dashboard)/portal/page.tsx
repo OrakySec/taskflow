@@ -137,11 +137,22 @@ export default function ClientPortal() {
                         {task.status === "DONE" && (
                           <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400">Concluída</span>
                         )}
+                        {task.status === "FAILED" && (
+                          <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400">Rejeitada</span>
+                        )}
                         
                         <span className="text-xs text-gray-400">
                           {new Date(task.createdAt).toLocaleDateString('pt-BR')}
                         </span>
                       </div>
+
+                      {task.status === 'FAILED' && task.comments?.length > 0 && (
+                        <div className="mt-3 p-3 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-lg">
+                          <p className="text-sm text-red-800 dark:text-red-300">
+                            <strong>Motivo da rejeição:</strong> {task.comments[0].content.replace('❌ **Motivo da falha:** ', '')}
+                          </p>
+                        </div>
+                      )}
                     </div>
                     
                     {task.assignedTo && (

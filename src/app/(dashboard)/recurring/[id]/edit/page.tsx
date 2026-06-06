@@ -18,7 +18,7 @@ export default async function EditRecurringPage({ params }: { params: Promise<{ 
       where: { id, companyId: session.user.companyId },
     }),
     prisma.user.findMany({
-      where: { companyId: session.user.companyId, isActive: true },
+      where: { companyId: session.user.companyId, isActive: true, role: { not: "CLIENT" } },
       select: { id: true, name: true },
       orderBy: { name: "asc" },
     }),

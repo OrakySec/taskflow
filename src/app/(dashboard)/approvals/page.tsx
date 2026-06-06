@@ -11,21 +11,26 @@ export default function ApprovalsPage() {
 
   // Users for assignees
   const [users, setUsers] = useState<any[]>([]);
+  const [teams, setTeams] = useState<any[]>([]);
   
   // Modal state
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [priority, setPriority] = useState("MEDIUM");
   const [assignedToId, setAssignedToId] = useState("unassigned");
   const [approving, setApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
 
   const fetchData = async () => {
     try {
-      const [tasksRes, usersRes] = await Promise.all([
+      const [tasksRes, usersRes, teamsRes] = await Promise.all([
         fetch("/api/tasks?status=DRAFT"),
-        fetch("/api/users")
+        fetch("/api/users"),
+        fetch("/api/teams")
       ]);
       if (tasksRes.ok) setDraftTasks(await tasksRes.json());
       if (usersRes.ok) setUsers(await usersRes.json());
+      if (teamsRes.ok) setTeams(await teamsRes.json());
     } catch (err) {
       console.error(err);
     } finally {
@@ -41,17 +46,18 @@ export default function ApprovalsPage() {
     if (!selectedTask) return;
     setApproving(true);
     try {
+      const isTeam = assignedToId.startsWith("team_");
+      const assignedTeamId = isTeam ? assignedToId.replace("team_", "") : null;
+      const assignedUserId = !isTeam && assignedToId !== "unassigned" ? assignedToId : null;
+
       const body: any = {
         title: selectedTask.title,
         description: selectedTask.description,
         status: "OPEN",
-        priority
+        priority,
+        assignedToId: assignedUserId,
+        assignedTeamId
       };
-      if (assignedToId !== "unassigned") {
-        body.assignedToId = assignedToId;
-      } else {
-        body.assignedToId = null;
-      }
 
       const res = await fetch(`/api/tasks/${selectedTask.id}`, {
         method: "PUT",
@@ -72,6 +78,36 @@ export default function ApprovalsPage() {
     }
   };
 
+  const handleReject = async () => {
+    if (!selectedTask || !rejectReason.trim()) return;
+    setApproving(true);
+    try {
+      const body: any = {
+        title: selectedTask.title,
+        description: selectedTask.description,
+        status: "FAILED",
+        failureReason: rejectReason,
+      };
+
+      const res = await fetch(`/api/tasks/${selectedTask.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        setSelectedTask(null);
+        fetchData();
+      } else {
+        alert("Erro ao rejeitar tarefa.");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setApproving(false);
+    }
+  };
+
   const priorityItems: SelectItem[] = [
     { value: "LOW", label: "Baixa", badgeClass: "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400" },
     { value: "MEDIUM", label: "Média", badgeClass: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/10 dark:text-yellow-400" },
@@ -80,15 +116,30 @@ export default function ApprovalsPage() {
   ];
 
   const assigneeItems: SelectItem[] = [
-    { value: "unassigned", label: "Sem responsável", badgeClass: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400" },
-    ...users.filter(u => u.role !== "CLIENT").map(u => ({
-      value: u.id,
-      label: u.name,
-      avatar: u.name,
-      avatarColor: getAvatarColor(u.name),
-      badgeClass: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-    }))
+    { value: "unassigned", label: "Sem responsável" }
   ];
+  if (teams.length > 0) {
+    assigneeItems.push({
+      label: "Equipes (Squads)",
+      options: teams.map((t) => ({
+        value: `team_${t.id}`,
+        label: t.name,
+        avatar: getInitials(t.name),
+        avatarColor: getAvatarColor(t.name),
+      })),
+    });
+  }
+  if (users.length > 0) {
+    assigneeItems.push({
+      label: "Membros Individuais",
+      options: users.filter(u => u.role !== "CLIENT").map((u) => ({
+        value: u.id,
+        label: u.name,
+        avatar: getInitials(u.name),
+        avatarColor: getAvatarColor(u.name),
+      })),
+    });
+  }
 
   if (loading) {
     return (
@@ -130,6 +181,8 @@ export default function ApprovalsPage() {
                     setSelectedTask(task);
                     setPriority("MEDIUM");
                     setAssignedToId("unassigned");
+                    setIsRejecting(false);
+                    setRejectReason("");
                   }}
                   className="shrink-0 flex items-center gap-2 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white px-4 py-2 rounded-xl transition-all shadow-sm"
                 >
@@ -151,44 +204,88 @@ export default function ApprovalsPage() {
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{selectedTask.description}</p>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prioridade</label>
-                <CustomSelect
-                  items={priorityItems}
-                  value={priority}
-                  onChange={setPriority}
-                  placeholder="Selecione..."
-                />
-              </div>
+            {!isRejecting ? (
+              <>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prioridade</label>
+                    <CustomSelect
+                      items={priorityItems}
+                      value={priority}
+                      onChange={setPriority}
+                      placeholder="Selecione..."
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Responsável</label>
-                <CustomSelect
-                  items={assigneeItems}
-                  value={assignedToId}
-                  onChange={setAssignedToId}
-                  placeholder="Selecione o responsável..."
-                />
-              </div>
-            </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Responsável</label>
+                    <CustomSelect
+                      items={assigneeItems}
+                      value={assignedToId}
+                      onChange={setAssignedToId}
+                      placeholder="Selecione o responsável..."
+                    />
+                  </div>
+                </div>
 
-            <div className="flex justify-end gap-3 mt-8">
-              <button
-                onClick={() => setSelectedTask(null)}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleApprove}
-                disabled={approving}
-                className="px-4 py-2 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-xl transition-colors font-medium flex items-center gap-2 disabled:opacity-70"
-              >
-                {approving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                Aprovar Tarefa
-              </button>
-            </div>
+                <div className="flex justify-end gap-3 mt-8">
+                  <button
+                    onClick={() => setSelectedTask(null)}
+                    className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => setIsRejecting(true)}
+                    className="px-4 py-2 text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-500/10 hover:bg-red-200 dark:hover:bg-red-500/20 rounded-xl transition-colors font-medium"
+                  >
+                    Rejeitar
+                  </button>
+                  <button
+                    onClick={handleApprove}
+                    disabled={approving}
+                    className="px-4 py-2 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-xl transition-colors font-medium flex items-center gap-2 disabled:opacity-70"
+                  >
+                    {approving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    Aprovar Tarefa
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="space-y-4 mt-4 border-t border-gray-100 dark:border-gray-800 pt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Motivo da Rejeição (o cliente verá isso no portal) *
+                    </label>
+                    <textarea
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white"
+                      rows={4}
+                      placeholder="Ex: Faltam informações para iniciar..."
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    onClick={() => setIsRejecting(false)}
+                    className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium"
+                  >
+                    Voltar
+                  </button>
+                  <button
+                    onClick={handleReject}
+                    disabled={approving || !rejectReason.trim()}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium flex items-center gap-2 disabled:opacity-70"
+                  >
+                    {approving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                    Confirmar Rejeição
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

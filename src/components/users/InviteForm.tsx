@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
+import CustomSelect, { SelectItem } from "@/components/ui/CustomSelect";
 
 export default function InviteForm() {
   const router = useRouter();
@@ -61,11 +62,16 @@ export default function InviteForm() {
           </div>
           <div className="form-group">
             <label className="label" htmlFor="role">Nível de acesso</label>
-            <select id="role" className="select" value={form.role} onChange={(e) => setForm(p => ({ ...p, role: e.target.value }))}>
-              <option value="COLLABORATOR">Colaborador — pode ver e executar tarefas próprias</option>
-              <option value="MANAGER">Gerente — pode criar e gerenciar tarefas</option>
-              <option value="ADMIN">Administrador — acesso total</option>
-            </select>
+            <CustomSelect 
+              id="role"
+              value={form.role} 
+              onChange={(val) => setForm(p => ({ ...p, role: val }))}
+              items={[
+                { value: "COLLABORATOR", label: "Colaborador — pode ver e executar tarefas próprias" },
+                { value: "MANAGER", label: "Gerente — pode criar e gerenciar tarefas" },
+                { value: "ADMIN", label: "Administrador — acesso total" }
+              ]}
+            />
           </div>
           <div className="alert alert-info" style={{ fontSize: "12px" }}>O colaborador receberá um e-mail com link para criar sua conta. O convite expira em 7 dias.</div>
         </div>

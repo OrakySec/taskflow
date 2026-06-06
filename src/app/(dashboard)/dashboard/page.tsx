@@ -71,7 +71,7 @@ async function getDashboardData(companyId: string, userId: string, isAdmin: bool
         ...visibilityFilter,
       },
     }),
-    prisma.user.count({ where: { companyId, isActive: true } }),
+    prisma.user.count({ where: { companyId, isActive: true, role: { not: "CLIENT" } } }),
     prisma.client.count({ where: { companyId, isActive: true } }),
     prisma.task.findMany({
       where: { companyId, ...visibilityFilter },
@@ -98,7 +98,7 @@ async function getDashboardData(companyId: string, userId: string, isAdmin: bool
       },
     }),
     prisma.user.findMany({
-      where: { companyId, isActive: true },
+      where: { companyId, isActive: true, role: { not: "CLIENT" } },
       select: {
         id: true,
         name: true,
