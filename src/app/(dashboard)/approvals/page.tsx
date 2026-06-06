@@ -20,6 +20,11 @@ export default function ApprovalsPage() {
   const [approving, setApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  
+  // Editable fields for approval
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editDeadline, setEditDeadline] = useState("");
 
   const fetchData = async () => {
     try {
@@ -51,8 +56,9 @@ export default function ApprovalsPage() {
       const assignedUserId = !isTeam && assignedToId !== "unassigned" ? assignedToId : null;
 
       const body: any = {
-        title: selectedTask.title,
-        description: selectedTask.description,
+        title: editTitle,
+        description: editDescription,
+        deadline: editDeadline ? new Date(editDeadline).toISOString() : null,
         status: "OPEN",
         priority,
         assignedToId: assignedUserId,
@@ -179,6 +185,9 @@ export default function ApprovalsPage() {
                 <button
                   onClick={() => {
                     setSelectedTask(task);
+                    setEditTitle(task.title);
+                    setEditDescription(task.description || "");
+                    setEditDeadline(task.deadline ? new Date(task.deadline).toISOString().split('T')[0] : "");
                     setPriority("MEDIUM");
                     setAssignedToId("unassigned");
                     setIsRejecting(false);
@@ -199,9 +208,25 @@ export default function ApprovalsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-[#1a1a24] rounded-2xl shadow-xl w-full max-w-lg border border-gray-100 dark:border-gray-800 p-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Aprovar Solicitação</h2>
-            <div className="mb-4 p-4 bg-gray-50 dark:bg-[#13131a] rounded-xl">
-              <h3 className="font-medium text-gray-900 dark:text-white">{selectedTask.title}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{selectedTask.description}</p>
+            <div className="mb-4">
+              <div className="mb-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Título</label>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#8b5cf6]"
+                />
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
+                <textarea
+                  rows={3}
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="w-full bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#8b5cf6] resize-none"
+                />
+              </div>
               
               {selectedTask.attachments && selectedTask.attachments.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -233,6 +258,16 @@ export default function ApprovalsPage() {
             {!isRejecting ? (
               <>
                 <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prazo de Entrega</label>
+                    <input
+                      type="date"
+                      value={editDeadline}
+                      onChange={(e) => setEditDeadline(e.target.value)}
+                      className="w-full bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#8b5cf6]"
+                    />
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prioridade</label>
                     <CustomSelect

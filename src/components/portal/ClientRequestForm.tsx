@@ -6,7 +6,6 @@ import { Loader2, Upload, X } from "lucide-react";
 export default function ClientRequestForm({ onSuccess }: { onSuccess?: () => void }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [deadline, setDeadline] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -55,7 +54,6 @@ export default function ClientRequestForm({ onSuccess }: { onSuccess?: () => voi
         body: JSON.stringify({
           title,
           description,
-          deadline: deadline || null,
           attachments,
         }),
       });
@@ -68,7 +66,6 @@ export default function ClientRequestForm({ onSuccess }: { onSuccess?: () => voi
       // Sucesso
       setTitle("");
       setDescription("");
-      setDeadline("");
       setFiles([]);
       if (onSuccess) onSuccess();
 
@@ -117,15 +114,6 @@ export default function ClientRequestForm({ onSuccess }: { onSuccess?: () => voi
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prazo Desejado (Opcional)</label>
-          <input
-            type="date"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            className="w-full bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#8b5cf6] outline-none transition-all"
-          />
-        </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Anexos (Imagens, PDFs, etc)</label>
