@@ -54,9 +54,9 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
 
     // Notificações de menção
     if (mentions.length > 0) {
+      // Cria a notificação interna para todos mencionados (inclusive o próprio usuário, para testes)
       await prisma.notification.createMany({
         data: mentions
-          .filter((uid) => uid !== session.user.id)
           .map((userId) => ({
             userId,
             type: "TASK_MENTION" as const,
@@ -65,6 +65,21 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
             link: `/tasks/${taskId}`,
           })),
       });
+
+      // Busca dados dos usuários para envio externo
+      const usersToNotify = await prisma.user.findMany({
+        where: { id: { in: mentions } },
+        select: { id: true, name: true, phone: true, notifyTelegram: true, notifyWhatsapp: true }
+      });
+
+      const { sendPersonalNotification } = await import("@/lib/notifications");
+
+      for (const u of usersToNotify) {
+        if (u.notifyTelegram || u.notifyWhatsapp) {
+          const msg = `*${session.user.name}* mencionou você na tarefa *${task.title}*.\n\nAcesse: ${process.env.NEXT_PUBLIC_APP_URL}/tasks/${taskId}`;
+          await sendPersonalNotification(session.user.companyId, u, msg);
+        }
+      }
     }
 
     // Notificação para o responsável se não for o autor
