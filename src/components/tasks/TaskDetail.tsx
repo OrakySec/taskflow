@@ -66,7 +66,7 @@ interface Task {
   title: string;
   description: string | null;
   priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
-  status: "OPEN" | "IN_PROGRESS" | "DONE" | "FAILED";
+  status: "DRAFT" | "OPEN" | "IN_PROGRESS" | "DONE" | "FAILED";
   deadline: Date | null;
   startedAt: Date | null;
   completedAt: Date | null;

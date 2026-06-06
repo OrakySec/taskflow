@@ -82,9 +82,10 @@ export const PRIORITY_LABELS = {
 };
 
 export const STATUS_LABELS = {
-  OPEN: "Aberta",
+  DRAFT: "Pendente/Rascunho",
+  OPEN: "Aberto",
   IN_PROGRESS: "Em Andamento",
-  DONE: "Concluída",
+  DONE: "Concluído",
   FAILED: "Falhou",
 };
 
@@ -96,6 +97,7 @@ export const PRIORITY_COLORS = {
 };
 
 export const STATUS_COLORS = {
+  DRAFT: "status-DRAFT",
   OPEN: "status-OPEN",
   IN_PROGRESS: "status-IN_PROGRESS",
   DONE: "status-DONE",
@@ -106,6 +108,7 @@ export const ROLE_LABELS = {
   ADMIN: "Administrador",
   MANAGER: "Gerente",
   COLLABORATOR: "Colaborador",
+  CLIENT: "Cliente",
 };
 
 export function getPriorityClass(priority: string): string {
