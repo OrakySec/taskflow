@@ -24,20 +24,20 @@ export default async function TaskDetailPage({ params }: { params: Params }) {
   const task = await prisma.task.findFirst({
     where: { id, companyId: session.user.companyId },
     include: {
-      assignedTo: { select: { id: true, name: true } },
+      assignedTo: { select: { id: true, name: true, avatar: true } },
       client: { select: { id: true, name: true } },
-      createdBy: { select: { id: true, name: true } },
+      createdBy: { select: { id: true, name: true, avatar: true } },
       template: { select: { id: true, name: true } },
       comments: {
         orderBy: { createdAt: "asc" },
         include: {
-          author: { select: { id: true, name: true } },
+          author: { select: { id: true, name: true, avatar: true } },
         },
       },
       attachments: { orderBy: { createdAt: "desc" } },
       history: {
         orderBy: { createdAt: "asc" },
-        include: { user: { select: { id: true, name: true } } },
+        include: { user: { select: { id: true, name: true, avatar: true } } },
       },
     },
   });
@@ -53,7 +53,7 @@ export default async function TaskDetailPage({ params }: { params: Params }) {
   // Busca usuários da empresa para @menção
   const companyUsers = await prisma.user.findMany({
     where: { companyId: session.user.companyId, isActive: true },
-    select: { id: true, name: true },
+    select: { id: true, name: true, avatar: true },
     orderBy: { name: "asc" },
   });
 
@@ -62,6 +62,7 @@ export default async function TaskDetailPage({ params }: { params: Params }) {
       task={task}
       currentUserId={session.user.id}
       currentUserName={session.user.name || ""}
+      currentUserAvatar={session.user.avatar}
       isAdmin={isAdmin}
       companyUsers={companyUsers}
     />

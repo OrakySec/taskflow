@@ -33,6 +33,7 @@ import {
 interface User {
   id: string;
   name: string;
+  avatar?: string | null;
 }
 
 interface Comment {
@@ -84,6 +85,7 @@ interface TaskDetailProps {
   task: Task;
   currentUserId: string;
   currentUserName: string;
+  currentUserAvatar?: string | null;
   isAdmin: boolean;
   companyUsers: User[];
 }
@@ -115,6 +117,7 @@ export default function TaskDetail({
   task: initialTask,
   currentUserId,
   currentUserName,
+  currentUserAvatar,
   isAdmin,
   companyUsers,
 }: TaskDetailProps) {
@@ -122,6 +125,7 @@ export default function TaskDetail({
   const [task, setTask] = useState(initialTask);
   const [activeTab, setActiveTab] = useState<ActiveTab>("chat");
   const [comment, setComment] = useState("");
+  const [mentionSearch, setMentionSearch] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
   const [showFailModal, setShowFailModal] = useState(false);
@@ -159,6 +163,37 @@ export default function TaskDetail({
       setFailReason("");
     }
   }
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setComment(val);
+
+    const cursor = e.target.selectionStart || 0;
+    const textBeforeCursor = val.slice(0, cursor);
+    const words = textBeforeCursor.split(" ");
+    const lastWord = words[words.length - 1];
+
+    if (lastWord.startsWith("@")) {
+      setMentionSearch(lastWord.slice(1).toLowerCase());
+    } else {
+      setMentionSearch(null);
+    }
+  };
+
+  const handleMentionSelect = (userName: string) => {
+    const input = document.getElementById("comment-input") as HTMLInputElement;
+    const cursor = input?.selectionStart || 0;
+    const textBeforeCursor = comment.slice(0, cursor);
+    const textAfterCursor = comment.slice(cursor);
+    
+    const words = textBeforeCursor.split(" ");
+    words.pop(); // remove the @... part
+    const newTextBefore = words.join(" ") + (words.length > 0 ? " " : "") + `@${userName} `;
+    
+    setComment(newTextBefore + textAfterCursor);
+    setMentionSearch(null);
+    setTimeout(() => input?.focus(), 0);
+  };
 
   async function sendComment(e: React.FormEvent) {
     e.preventDefault();
@@ -460,8 +495,12 @@ export default function TaskDetail({
                         flexDirection: isMine ? "row-reverse" : "row",
                       }}
                     >
-                      <div className="avatar avatar-sm" style={{ flexShrink: 0 }}>
-                        {getInitials(c.author.name)}
+                      <div className="avatar avatar-sm overflow-hidden" style={{ flexShrink: 0 }}>
+                        {c.author.avatar ? (
+                          <img src={c.author.avatar} alt={c.author.name} className="w-full h-full object-cover" />
+                        ) : (
+                          getInitials(c.author.name)
+                        )}
                       </div>
                       <div
                         style={{
@@ -506,27 +545,67 @@ export default function TaskDetail({
                 })}
               </div>
 
-              {/* Comment input */}
-              <form
-                onSubmit={sendComment}
-                style={{
-                  padding: "12px 16px",
-                  borderTop: "1px solid var(--border)",
-                  display: "flex",
-                  gap: "8px",
-                }}
-              >
-                <div className="avatar avatar-sm" style={{ flexShrink: 0, marginTop: "2px" }}>
-                  {getInitials(currentUserName)}
-                </div>
-                <input
-                  type="text"
-                  className="input"
-                  placeholder="Escreva um comentário... Use @nome para mencionar"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  style={{ flex: 1 }}
-                />
+              {/* Comment input area */}
+              <div style={{ position: "relative" }}>
+                {mentionSearch !== null && (
+                  <div
+                    className="absolute bottom-full left-0 mb-2 w-64 bg-white dark:bg-[#15151a] rounded-xl shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden z-50 flex flex-col"
+                    style={{ maxHeight: "200px", overflowY: "auto" }}
+                  >
+                    {companyUsers
+                      .filter((u) => u.name.toLowerCase().includes(mentionSearch))
+                      .map((u) => (
+                        <button
+                          key={u.id}
+                          type="button"
+                          onClick={() => handleMentionSelect(u.name)}
+                          className="flex items-center gap-3 px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                        >
+                          <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-400 overflow-hidden shrink-0">
+                            {u.avatar ? (
+                              <img src={u.avatar} alt={u.name} className="w-full h-full object-cover" />
+                            ) : (
+                              getInitials(u.name)
+                            )}
+                          </div>
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
+                            {u.name}
+                          </span>
+                        </button>
+                      ))}
+                    {companyUsers.filter((u) => u.name.toLowerCase().includes(mentionSearch)).length === 0 && (
+                      <div className="px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
+                        Nenhum usuário encontrado
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <form
+                  onSubmit={sendComment}
+                  style={{
+                    padding: "12px 16px",
+                    borderTop: "1px solid var(--border)",
+                    display: "flex",
+                    gap: "8px",
+                  }}
+                >
+                  <div className="avatar avatar-sm overflow-hidden" style={{ flexShrink: 0, marginTop: "2px" }}>
+                    {currentUserAvatar ? (
+                      <img src={currentUserAvatar} alt={currentUserName} className="w-full h-full object-cover" />
+                    ) : (
+                      getInitials(currentUserName)
+                    )}
+                  </div>
+                  <input
+                    id="comment-input"
+                    type="text"
+                    className="input"
+                    placeholder="Escreva um comentário... Use @nome para mencionar"
+                    value={comment}
+                    onChange={handleCommentChange}
+                    style={{ flex: 1 }}
+                  />
                 <button
                   type="submit"
                   className="btn btn-primary btn-sm"
@@ -539,7 +618,8 @@ export default function TaskDetail({
                     <Send size={14} />
                   )}
                 </button>
-              </form>
+                </form>
+              </div>
             </div>
           )}
 
@@ -603,9 +683,14 @@ export default function TaskDetail({
                       color: "var(--text-muted)",
                       fontWeight: "600",
                       zIndex: 1,
+                      overflow: "hidden",
                     }}
                   >
-                    {getInitials(entry.user.name)}
+                    {entry.user.avatar ? (
+                      <img src={entry.user.avatar} alt={entry.user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      getInitials(entry.user.name)
+                    )}
                   </div>
                   <div>
                     <span
@@ -783,8 +868,12 @@ export default function TaskDetail({
                       gap: "6px",
                     }}
                   >
-                    <div className="avatar avatar-sm">
-                      {getInitials(task.assignedTo.name)}
+                    <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-300 overflow-hidden shrink-0">
+                      {task.assignedTo.avatar ? (
+                        <img src={task.assignedTo.avatar} alt={task.assignedTo.name} className="w-full h-full object-cover" />
+                      ) : (
+                        getInitials(task.assignedTo.name)
+                      )}
                     </div>
                     <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
                       {task.assignedTo.name}

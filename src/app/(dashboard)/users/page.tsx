@@ -16,7 +16,7 @@ export default async function UsersPage() {
 
   const users = await prisma.user.findMany({
     where: { companyId: session.user.companyId },
-    select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true, _count: { select: { assignedTasks: true } } },
+    select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true, avatar: true, _count: { select: { assignedTasks: true } } },
     orderBy: { name: "asc" },
   });
 
@@ -34,7 +34,13 @@ export default async function UsersPage() {
         {users.map((user) => (
           <div key={user.id} className="card" style={{ padding: "16px 20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div className="avatar">{getInitials(user.name)}</div>
+              <div className="avatar overflow-hidden">
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  getInitials(user.name)
+                )}
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
                   <span style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-primary)" }}>{user.name}</span>

@@ -4,12 +4,15 @@ import { useState } from "react";
 import { User, Smartphone, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { useSession } from "next-auth/react";
+
 // Define some predefined DiceBear avatars
-const PREDEFINED_AVATARS = Array.from({ length: 14 }).map((_, i) => 
+const PREDEFINED_AVATARS = Array.from({ length: 30 }).map((_, i) => 
   `https://api.dicebear.com/7.x/adventurer/svg?seed=taskflow${i + 1}`
 );
 
 export default function ProfileClient({ user }: { user: any }) {
+  const { update } = useSession();
   const [name, setName] = useState(user.name || "");
   const [phone, setPhone] = useState(user.phone || "");
   const [notifyWhatsapp, setNotifyWhatsapp] = useState(user.notifyWhatsapp || false);
@@ -32,6 +35,7 @@ export default function ProfileClient({ user }: { user: any }) {
       });
 
       if (res.ok) {
+        await update({ avatar }); // Update local session
         setMessage({ type: "success", text: "Perfil atualizado com sucesso!" });
         router.refresh(); // Refresh page to update header avatar
       } else {

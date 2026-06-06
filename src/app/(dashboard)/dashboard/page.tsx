@@ -59,7 +59,7 @@ async function getDashboardData(companyId: string) {
       orderBy: { createdAt: "desc" },
       take: 6,
       include: {
-        assignedTo: { select: { name: true } },
+        assignedTo: { select: { name: true, avatar: true } },
         client: { select: { name: true } },
       },
     }),
@@ -72,7 +72,7 @@ async function getDashboardData(companyId: string) {
       orderBy: { createdAt: "desc" },
       take: 4,
       include: {
-        assignedTo: { select: { name: true } },
+        assignedTo: { select: { name: true, avatar: true } },
       },
     }),
     prisma.user.findMany({
@@ -237,8 +237,14 @@ export default async function DashboardPage() {
                       <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1 shrink-0">
                         {task.assignedTo && (
                           <div className="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
-                            <div className="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center text-[9px] font-bold">
-                              {task.assignedTo.name.charAt(0)}
+                            <div className="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[9px] font-bold text-indigo-700 dark:text-indigo-400 overflow-hidden shrink-0">
+                              {(task.assignedTo as any).avatar ? (
+                                <img src={(task.assignedTo as any).avatar} alt={task.assignedTo.name} className="w-full h-full object-cover" />
+                              ) : (
+                                task.assignedTo.name.split(" ").length > 1 
+                                  ? `${task.assignedTo.name.split(" ")[0][0]}${task.assignedTo.name.split(" ")[1][0]}`
+                                  : task.assignedTo.name.charAt(0)
+                              )}
                             </div>
                             {task.assignedTo.name.split(" ")[0]}
                           </div>

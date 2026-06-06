@@ -56,7 +56,7 @@ export default async function TasksPage({ searchParams }: PageProps) {
         { createdAt: "desc" },
       ],
       include: {
-        assignedTo: { select: { id: true, name: true } },
+        assignedTo: { select: { id: true, name: true, avatar: true } },
         client: { select: { id: true, name: true } },
         _count: { select: { comments: true, attachments: true } },
       },

@@ -91,8 +91,12 @@ export default function KanbanCard({ task }: KanbanCardProps) {
         </div>
 
         {task.assignedTo ? (
-          <div className="avatar avatar-sm ring-2 ring-white dark:ring-[#161925]" title={task.assignedTo.name}>
-            {getInitials(task.assignedTo.name)}
+          <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-300 ml-auto shrink-0 overflow-hidden" title={task.assignedTo.name}>
+            {task.assignedTo.avatar ? (
+              <img src={task.assignedTo.avatar} alt={task.assignedTo.name} className="w-full h-full object-cover" />
+            ) : (
+              getInitials(task.assignedTo.name)
+            )}
           </div>
         ) : (
           <div className="avatar avatar-sm bg-transparent border border-dashed border-slate-300 dark:border-slate-600 text-slate-400" title="Não atribuído">
