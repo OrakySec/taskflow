@@ -20,9 +20,10 @@ interface KanbanCardProps {
     assignedTeam?: { id: string; name: string } | null;
     _count: { comments: number; attachments: number };
   };
+  readonly?: boolean;
 }
 
-export default function KanbanCard({ task }: KanbanCardProps) {
+export default function KanbanCard({ task, readonly = false }: KanbanCardProps) {
   const {
     attributes,
     listeners,
@@ -32,6 +33,7 @@ export default function KanbanCard({ task }: KanbanCardProps) {
     isDragging,
   } = useSortable({
     id: task.id,
+    disabled: readonly,
     data: {
       type: "Task",
       task,
@@ -51,11 +53,11 @@ export default function KanbanCard({ task }: KanbanCardProps) {
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      className={`card glass-panel-hover relative cursor-grab mb-3 flex flex-col border-l-[4px] hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 ${
+      className={`kanban-card card glass-panel-hover relative mb-3 flex flex-col border-l-[4px] hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300 ${
         task.priority === "URGENT" ? "border-l-red-500" :
         task.priority === "HIGH" ? "border-l-orange-500" :
         task.priority === "MEDIUM" ? "border-l-amber-500" : "border-l-emerald-500"
-      } ${isDragging ? "ring-2 ring-indigo-500 shadow-2xl scale-105 z-50 opacity-80 cursor-grabbing" : "opacity-100 hover:shadow-xl"}`}
+      } ${readonly ? "cursor-default" : "cursor-grab"} ${isDragging ? "ring-2 ring-indigo-500 shadow-2xl scale-105 z-50 opacity-80 !cursor-grabbing" : "opacity-100 hover:shadow-xl"}`}
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -75,6 +77,13 @@ export default function KanbanCard({ task }: KanbanCardProps) {
       <div className="text-sm font-semibold text-slate-900 dark:text-white mb-3 leading-snug">
         {task.title}
       </div>
+
+      {task.status === 'FAILED' && (task as any).comments?.length > 0 && (
+        <div className="mb-3 p-2 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded text-[11px] text-red-800 dark:text-red-300">
+          <span className="font-semibold block mb-0.5">Motivo da Rejeição:</span>
+          <span className="line-clamp-2">{(task as any).comments[0].content.replace('❌ **Motivo da falha:** ', '')}</span>
+        </div>
+      )}
 
       <div className="flex items-center justify-between mt-auto">
         <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">

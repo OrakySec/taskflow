@@ -63,6 +63,9 @@ export async function GET(request: Request) {
           where: { content: { startsWith: '❌ **Motivo da falha:**' } },
           orderBy: { createdAt: 'desc' },
           take: 1
+        },
+        _count: {
+          select: { comments: true, attachments: true }
         }
       }
     });

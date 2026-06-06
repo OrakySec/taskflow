@@ -20,15 +20,17 @@ interface Task {
 
 interface KanbanColumnProps {
   column: {
-    id: TaskStatus;
+    id: TaskStatus | string;
     title: string;
   };
   tasks: Task[];
+  readonly?: boolean;
 }
 
-export default function KanbanColumn({ column, tasks }: KanbanColumnProps) {
+export default function KanbanColumn({ column, tasks, readonly = false }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
+    disabled: readonly,
     data: {
       type: "Column",
       column,
@@ -67,7 +69,7 @@ export default function KanbanColumn({ column, tasks }: KanbanColumnProps) {
       >
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
-            <KanbanCard key={task.id} task={task} />
+            <KanbanCard key={task.id} task={task} readonly={readonly} />
           ))}
         </SortableContext>
         

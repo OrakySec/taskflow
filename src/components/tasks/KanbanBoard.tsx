@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -32,18 +32,44 @@ interface Task {
 
 interface KanbanBoardProps {
   initialTasks: Task[];
+  columns?: { id: string; title: string }[];
+  readonly?: boolean;
 }
 
-const COLUMNS: { id: TaskStatus; title: string }[] = [
+const DEFAULT_COLUMNS = [
   { id: "OPEN", title: "Abertas" },
   { id: "IN_PROGRESS", title: "Em Andamento" },
   { id: "DONE", title: "Concluídas" },
   { id: "FAILED", title: "Falhou / Canceladas" },
 ];
 
-export default function KanbanBoard({ initialTasks }: KanbanBoardProps) {
+export default function KanbanBoard({ initialTasks, columns = DEFAULT_COLUMNS, readonly = false }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isDraggingScroll, setIsDraggingScroll] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('.kanban-card')) return;
+    if (!scrollContainerRef.current) return;
+    setIsDraggingScroll(true);
+    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
+    setScrollLeft(scrollContainerRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => setIsDraggingScroll(false);
+  const handleMouseUp = () => setIsDraggingScroll(false);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingScroll || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -139,12 +165,20 @@ export default function KanbanBoard({ initialTasks }: KanbanBoardProps) {
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-6 overflow-x-auto pb-4 h-full custom-scrollbar">
-        {COLUMNS.map((col) => (
+      <div 
+        ref={scrollContainerRef}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        className={`flex gap-6 overflow-x-auto pb-4 h-full custom-scrollbar ${isDraggingScroll ? 'cursor-grabbing' : ''}`}
+      >
+        {columns.map((col) => (
           <KanbanColumn
             key={col.id}
-            column={col}
+            column={col as any}
             tasks={tasks.filter((t) => t.status === col.id)}
+            readonly={readonly}
           />
         ))}
       </div>
