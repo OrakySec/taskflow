@@ -206,9 +206,15 @@ export default function ApprovalsPage() {
 
       {selectedTask && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#1a1a24] rounded-2xl shadow-xl w-full max-w-lg border border-gray-100 dark:border-gray-800 p-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Aprovar Solicitação</h2>
-            <div className="mb-4">
+          <div className="bg-white dark:bg-[#1a1a24] rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Aprovar Solicitação</h2>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Esquerda: Informações da Tarefa */}
+                <div className="space-y-4">
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Título</label>
                 <input
@@ -229,33 +235,46 @@ export default function ApprovalsPage() {
               </div>
               
               {selectedTask.attachments && selectedTask.attachments.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                     <Paperclip className="w-4 h-4 text-gray-500" />
                     Anexos ({selectedTask.attachments.length})
                   </h4>
-                  <ul className="space-y-2">
-                    {selectedTask.attachments.map((file: any) => (
-                      <li key={file.id} className="flex items-center justify-between p-2 bg-white dark:bg-[#1a1a24] border border-gray-100 dark:border-gray-800 rounded-lg">
-                        <span className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[200px]" title={file.filename}>
-                          {file.filename}
-                        </span>
-                        <a
-                          href={file.fileUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs text-[#8b5cf6] hover:text-[#7c3aed] font-medium px-2 py-1 bg-[#8b5cf6]/10 rounded-md"
-                        >
-                          Ver
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedTask.attachments.map((file: any) => {
+                      const isImage = file.mimeType?.startsWith('image/');
+                      const isVideo = file.mimeType?.startsWith('video/');
+                      
+                      return (
+                        <div key={file.id} className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#13131a]">
+                          {isImage ? (
+                            <a href={file.fileUrl} target="_blank" rel="noreferrer" className="block aspect-video">
+                              <img src={file.fileUrl} alt={file.filename} className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <span className="text-white text-xs font-medium">Ampliar</span>
+                              </div>
+                            </a>
+                          ) : isVideo ? (
+                            <video src={file.fileUrl} controls className="w-full aspect-video object-cover" />
+                          ) : (
+                            <a href={file.fileUrl} target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center aspect-video p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                              <Paperclip className="w-8 h-8 text-gray-400 mb-2" />
+                              <span className="text-xs text-center text-gray-600 dark:text-gray-400 break-all line-clamp-2">{file.filename}</span>
+                            </a>
+                          )}
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-1.5 backdrop-blur-sm">
+                             <p className="text-[10px] text-white truncate text-center" title={file.filename}>{file.filename}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
 
-            {!isRejecting ? (
+            {/* Direita: Controles e Rejeição */}
+            <div className="space-y-4">
               <>
                 <div className="space-y-4">
                   <div>
@@ -288,8 +307,32 @@ export default function ApprovalsPage() {
                     />
                   </div>
                 </div>
+              </>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Motivo da Rejeição (o cliente verá isso no portal) *
+                    </label>
+                    <textarea
+                      className="w-full px-3 py-2 bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-red-500"
+                      rows={8}
+                      placeholder="Ex: Faltam informações para iniciar..."
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+            </div>
+          </div>
+        </div>
 
-                <div className="flex justify-end gap-3 mt-8">
+        <div className="p-6 border-t border-gray-100 dark:border-gray-800 shrink-0 bg-gray-50/50 dark:bg-[#13131a]/50">
+          {!isRejecting ? (
+            <div className="flex justify-end gap-3">
                   <button
                     onClick={() => setSelectedTask(null)}
                     className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium"
@@ -310,45 +353,28 @@ export default function ApprovalsPage() {
                     {approving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                     Aprovar Tarefa
                   </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="space-y-4 mt-4 border-t border-gray-100 dark:border-gray-800 pt-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Motivo da Rejeição (o cliente verá isso no portal) *
-                    </label>
-                    <textarea
-                      className="w-full px-3 py-2 bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white"
-                      rows={4}
-                      placeholder="Ex: Faltam informações para iniciar..."
-                      value={rejectReason}
-                      onChange={(e) => setRejectReason(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-3 mt-6">
-                  <button
-                    onClick={() => setIsRejecting(false)}
-                    className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium"
-                  >
-                    Voltar
-                  </button>
-                  <button
-                    onClick={handleReject}
-                    disabled={approving || !rejectReason.trim()}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium flex items-center gap-2 disabled:opacity-70"
-                  >
-                    {approving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                    Confirmar Rejeição
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsRejecting(false)}
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors font-medium"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={handleReject}
+                disabled={approving || !rejectReason.trim()}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors font-medium flex items-center gap-2 disabled:opacity-70"
+              >
+                {approving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                Confirmar Rejeição
+              </button>
+            </div>
+          )}
         </div>
+      </div>
+    </div>
       )}
     </div>
   );
