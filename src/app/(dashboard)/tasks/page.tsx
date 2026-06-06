@@ -34,9 +34,19 @@ export default async function TasksPage({ searchParams }: PageProps) {
     companyId: session.user.companyId,
   };
 
-  // Colaborador só vê suas tarefas
+  // Colaborador só vê suas tarefas, tarefas de sua equipe, ou tarefas sem atribuição
   if (!isAdmin) {
-    where.assignedToId = session.user.id;
+    const userTeams = await prisma.team.findMany({
+      where: { members: { some: { id: session.user.id } } },
+      select: { id: true }
+    });
+    const teamIds = userTeams.map(t => t.id);
+
+    where.OR = [
+      { assignedToId: session.user.id },
+      { assignedTeamId: { in: teamIds } },
+      { assignedToId: null, assignedTeamId: null }
+    ];
   }
 
   if (params.status) where.status = params.status as TaskStatus;

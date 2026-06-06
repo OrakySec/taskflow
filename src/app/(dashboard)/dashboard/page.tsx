@@ -19,11 +19,28 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
-async function getDashboardData(companyId: string) {
+async function getDashboardData(companyId: string, userId: string, isAdmin: boolean) {
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const weekStart = new Date(todayStart);
   weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+  let visibilityFilter: any = {};
+  if (!isAdmin) {
+    const userTeams = await prisma.team.findMany({
+      where: { members: { some: { id: userId } } },
+      select: { id: true }
+    });
+    const teamIds = userTeams.map(t => t.id);
+
+    visibilityFilter = {
+      OR: [
+        { assignedToId: userId },
+        { assignedTeamId: { in: teamIds } },
+        { assignedToId: null, assignedTeamId: null }
+      ]
+    };
+  }
 
   const [
     totalOpen,
@@ -36,13 +53,14 @@ async function getDashboardData(companyId: string) {
     urgentTasks,
     tasksByUser,
   ] = await Promise.all([
-    prisma.task.count({ where: { companyId, status: "OPEN" } }),
-    prisma.task.count({ where: { companyId, status: "IN_PROGRESS" } }),
+    prisma.task.count({ where: { companyId, status: "OPEN", ...visibilityFilter } }),
+    prisma.task.count({ where: { companyId, status: "IN_PROGRESS", ...visibilityFilter } }),
     prisma.task.count({
       where: {
         companyId,
         status: "DONE",
         completedAt: { gte: todayStart },
+        ...visibilityFilter,
       },
     }),
     prisma.task.count({
@@ -50,16 +68,18 @@ async function getDashboardData(companyId: string) {
         companyId,
         status: { in: ["OPEN", "IN_PROGRESS"] },
         deadline: { lt: now },
+        ...visibilityFilter,
       },
     }),
     prisma.user.count({ where: { companyId, isActive: true } }),
     prisma.client.count({ where: { companyId, isActive: true } }),
     prisma.task.findMany({
-      where: { companyId },
+      where: { companyId, ...visibilityFilter },
       orderBy: { createdAt: "desc" },
       take: 6,
       include: {
         assignedTo: { select: { name: true, avatar: true } },
+        assignedTeam: { select: { name: true } },
         client: { select: { name: true } },
       },
     }),
@@ -68,11 +88,13 @@ async function getDashboardData(companyId: string) {
         companyId,
         priority: "URGENT",
         status: { in: ["OPEN", "IN_PROGRESS"] },
+        ...visibilityFilter,
       },
       orderBy: { createdAt: "desc" },
       take: 4,
       include: {
         assignedTo: { select: { name: true, avatar: true } },
+        assignedTeam: { select: { name: true } },
       },
     }),
     prisma.user.findMany({
@@ -112,11 +134,13 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session) redirect("/login");
 
-  const { stats, recentTasks, urgentTasks, tasksByUser } = await getDashboardData(
-    session.user.companyId
-  );
-
   const isAdmin = session.user.role === "ADMIN" || session.user.role === "MANAGER";
+
+  const { stats, recentTasks, urgentTasks, tasksByUser } = await getDashboardData(
+    session.user.companyId,
+    session.user.id,
+    isAdmin
+  );
 
   return (
     <div className="flex flex-col gap-8 pb-10">
