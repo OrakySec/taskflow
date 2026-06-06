@@ -85,118 +85,16 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      <div className="card" style={{ padding: "32px" }}>
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: "18px" }}
-        >
-          {error && <div className="alert alert-error">{error}</div>}
-
-          <div className="form-group">
-            <label className="label" htmlFor="companyName">
-              Nome da Empresa
-            </label>
-            <input
-              id="companyName"
-              name="companyName"
-              type="text"
-              className="input"
-              placeholder="Minha Agência de Tráfego"
-              value={form.companyName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="label" htmlFor="name">
-              Seu Nome
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              className="input"
-              placeholder="João Silva"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="label" htmlFor="email">
-              E-mail
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              className="input"
-              placeholder="seu@email.com"
-              value={form.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="label" htmlFor="password">
-              Senha
-            </label>
-            <div style={{ position: "relative" }}>
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                className="input"
-                placeholder="Mínimo 6 caracteres"
-                value={form.password}
-                onChange={handleChange}
-                required
-                minLength={6}
-                style={{ paddingRight: "44px" }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--text-muted)",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={loading}
-            style={{ width: "100%", padding: "12px", marginTop: "4px" }}
-          >
-            {loading ? (
-              <>
-                <Loader2
-                  size={16}
-                  style={{ animation: "spin 1s linear infinite" }}
-                />
-                Criando conta...
-              </>
-            ) : (
-              "Criar Conta Grátis"
-            )}
-          </button>
-        </form>
+      <div className="card" style={{ padding: "32px", textAlign: "center" }}>
+        <div style={{ marginBottom: "16px" }}>
+          <span style={{ fontSize: "48px" }}>🔒</span>
+        </div>
+        <h2 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "12px", color: "var(--text-primary)" }}>
+          Criação de Contas Desativada
+        </h2>
+        <p style={{ color: "var(--text-secondary)", fontSize: "14px", lineHeight: "1.5" }}>
+          No momento, o sistema é restrito apenas para convidados e uso interno. A criação de novas contas públicas está temporariamente suspensa.
+        </p>
       </div>
 
       <p

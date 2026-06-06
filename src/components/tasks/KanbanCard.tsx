@@ -89,6 +89,8 @@ export default function KanbanCard({ task }: KanbanCardProps) {
               {task._count.attachments > 0 && <span className="flex items-center gap-0.5"><Paperclip size={12} /> {task._count.attachments}</span>}
             </div>
           )}
+        </div>
+        
         {task.assignedTeam ? (
           <div className="w-6 h-6 rounded-full bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-400 ml-auto shrink-0 overflow-hidden" title={`Equipe: ${task.assignedTeam.name}`}>
             {getInitials(task.assignedTeam.name)}
