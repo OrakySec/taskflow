@@ -150,8 +150,7 @@ export async function POST(req: NextRequest) {
           .filter(m => m.id !== session.user.id)
           .map(m => ({
             userId: m.id,
-            companyId: session.user.companyId,
-            type: "TASK_ASSIGNED",
+            type: "TASK_ASSIGNED" as any,
             title: "Nova tarefa para equipe",
             body: `A equipe ${task.assignedTeam?.name} recebeu: ${task.title}`,
             link: `/tasks/${task.id}`,
