@@ -760,7 +760,7 @@ export default function TaskDetail({
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   {task.attachments.map((att) => {
-                    const displayUrl = att.fileUrl?.replace(/^http:\/\/minio:9000/, '/minio') || '#';
+                    const displayUrl = att.fileUrl?.replace(/^http:\/\/minio:9000/, '/api/minio') || '#';
                     return (
                       <a
                         key={att.id}

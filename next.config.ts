@@ -8,14 +8,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.ykaromarques.com" },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/minio/:path*',
-        destination: `http://${process.env.MINIO_ENDPOINT || 'localhost'}:${process.env.MINIO_PORT || '9000'}/:path*`,
-      },
-    ];
-  },
   turbopack: {},
 };
 

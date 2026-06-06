@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
       // Rewrite internal Docker hostname to Next.js proxy path so it works in the browser
       if (fileUrl.startsWith('http://minio:9000')) {
-        fileUrl = fileUrl.replace('http://minio:9000', '/minio');
+        fileUrl = fileUrl.replace('http://minio:9000', '/api/minio');
       }
 
       uploadedFiles.push({

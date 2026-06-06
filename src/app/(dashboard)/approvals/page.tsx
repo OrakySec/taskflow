@@ -244,7 +244,7 @@ export default function ApprovalsPage() {
                     {selectedTask.attachments.map((file: any) => {
                       const isImage = file.mimeType?.startsWith('image/');
                       const isVideo = file.mimeType?.startsWith('video/');
-                      const displayUrl = file.fileUrl?.replace(/^http:\/\/minio:9000/, '/minio') || '#';
+                      const displayUrl = file.fileUrl?.replace(/^http:\/\/minio:9000/, '/api/minio') || '#';
                       
                       return (
                         <div key={file.id} className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#13131a]">
