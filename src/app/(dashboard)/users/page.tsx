@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { UserPlus, CheckSquare, Shield, Users } from "lucide-react";
 import { formatDate, getInitials, ROLE_LABELS } from "@/lib/utils";
+import DeleteUserButton from "@/components/users/DeleteUserButton";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Equipe" };
@@ -56,6 +57,10 @@ export default async function UsersPage() {
                   <Shield size={10} /> {ROLE_LABELS[user.role]}
                 </span>
                 <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>desde {formatDate(user.createdAt)}</div>
+                
+                {user.id !== session.user.id && (
+                  <DeleteUserButton userId={user.id} userName={user.name} />
+                )}
               </div>
             </div>
           </div>
