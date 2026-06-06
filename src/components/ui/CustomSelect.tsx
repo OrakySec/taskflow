@@ -8,6 +8,7 @@ export type SelectOption = {
   label: string;
   avatar?: string; // Optional initials
   avatarColor?: string; // Dynamic background color
+  badgeClass?: string; // Badge styling (used in older pages, preserved for compatibility)
 };
 
 export type SelectGroup = {

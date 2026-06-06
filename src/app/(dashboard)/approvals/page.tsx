@@ -169,7 +169,6 @@ export default function ApprovalsPage() {
                   value={assignedToId}
                   onChange={setAssignedToId}
                   placeholder="Selecione o responsável..."
-                  searchable
                 />
               </div>
             </div>
