@@ -21,6 +21,7 @@ export default async function EditTaskPage({ params }: { params: Params }) {
       title: true,
       description: true,
       priority: true,
+      status: true,
       deadline: true,
       assignedToId: true,
       assignedTeamId: true,

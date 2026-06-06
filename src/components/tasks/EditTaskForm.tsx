@@ -13,6 +13,7 @@ interface EditTaskFormProps {
     title: string;
     description: string | null;
     priority: string;
+    status: string;
     deadline: Date | null;
     assignedToId: string | null;
     assignedTeamId?: string | null;
@@ -31,6 +32,7 @@ export default function EditTaskForm({ task, users, teams = [], clients }: EditT
     title: task.title,
     description: task.description || "",
     priority: task.priority,
+    status: task.status,
     assignedToId: task.assignedTeamId ? `team_${task.assignedTeamId}` : (task.assignedToId || ""),
     clientId: task.clientId || "",
     deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : "",
