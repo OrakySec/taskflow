@@ -16,7 +16,7 @@ interface KanbanCardProps {
     deadline: Date | null;
     createdAt: Date;
     client: { name: string } | null;
-    assignedTo: { id: string; name: string } | null;
+    assignedTo: { id: string; name: string; avatar?: string | null } | null;
     _count: { comments: number; attachments: number };
   };
 }
