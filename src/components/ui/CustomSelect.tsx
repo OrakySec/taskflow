@@ -82,7 +82,7 @@ export default function CustomSelect({
 
       {isOpen && (
         <div
-          className="absolute z-50 w-full mt-1 bg-white dark:bg-[#181824] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-[300px] overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100"
+          className="absolute z-50 w-full mt-1 bg-white dark:bg-[#181824] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-[220px] overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100"
           style={{ top: "100%", left: 0 }}
         >
           {items.map((item, index) => {

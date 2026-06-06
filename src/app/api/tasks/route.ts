@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { sendNotification } from "@/lib/notifications";
+import { sendNotification, sendPersonalNotification } from "@/lib/notifications";
 import {
   buildTaskCreatedMessage,
 } from "@/lib/whatsapp";
@@ -199,7 +199,20 @@ export async function POST(req: NextRequest) {
       createdBy: task.createdBy.name,
     });
 
-    sendNotification(session.user.companyId, message).catch(console.error);
+    if (isClient) {
+      const managers = await prisma.user.findMany({
+        where: {
+          companyId: session.user.companyId,
+          role: { in: ["ADMIN", "MANAGER"] },
+          isActive: true
+        }
+      });
+      for (const manager of managers) {
+        sendPersonalNotification(session.user.companyId, manager, message, false).catch(console.error);
+      }
+    } else {
+      sendNotification(session.user.companyId, message).catch(console.error);
+    }
 
     return NextResponse.json(task, { status: 201 });
   } catch (error) {
