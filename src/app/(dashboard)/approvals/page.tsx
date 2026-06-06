@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, CheckCircle, Clock } from "lucide-react";
+import { Loader2, CheckCircle, Clock, Paperclip } from "lucide-react";
 import CustomSelect, { SelectItem } from "@/components/ui/CustomSelect";
 import { getInitials, getAvatarColor } from "@/lib/utils";
 
@@ -202,6 +202,32 @@ export default function ApprovalsPage() {
             <div className="mb-4 p-4 bg-gray-50 dark:bg-[#13131a] rounded-xl">
               <h3 className="font-medium text-gray-900 dark:text-white">{selectedTask.title}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{selectedTask.description}</p>
+              
+              {selectedTask.attachments && selectedTask.attachments.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    <Paperclip className="w-4 h-4 text-gray-500" />
+                    Anexos ({selectedTask.attachments.length})
+                  </h4>
+                  <ul className="space-y-2">
+                    {selectedTask.attachments.map((file: any) => (
+                      <li key={file.id} className="flex items-center justify-between p-2 bg-white dark:bg-[#1a1a24] border border-gray-100 dark:border-gray-800 rounded-lg">
+                        <span className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[200px]" title={file.filename}>
+                          {file.filename}
+                        </span>
+                        <a
+                          href={file.fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-[#8b5cf6] hover:text-[#7c3aed] font-medium px-2 py-1 bg-[#8b5cf6]/10 rounded-md"
+                        >
+                          Ver
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
 
             {!isRejecting ? (

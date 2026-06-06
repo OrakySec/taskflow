@@ -74,6 +74,7 @@ export async function GET(req: NextRequest) {
       assignedTo: { select: { id: true, name: true, avatar: true } },
       assignedTeam: { select: { id: true, name: true } },
       client: { select: { id: true, name: true } },
+      attachments: true,
       _count: { select: { comments: true, attachments: true } },
     },
   });
