@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, LayoutTemplate } from "lucide-react";
 import Link from "next/link";
+import CustomSelect, { SelectItem } from "@/components/ui/CustomSelect";
+import { getInitials, getAvatarColor } from "@/lib/utils";
 
 interface NewTaskFormProps {
   users: { id: string; name: string }[];
@@ -83,6 +85,32 @@ export default function NewTaskForm({ users, clients, templates, teams = [] }: N
     }
 
     router.push(`/tasks/${data.id}`);
+  }
+
+  const assigneeItems: SelectItem[] = [
+    { value: "", label: "Sem responsável" },
+  ];
+  if (teams.length > 0) {
+    assigneeItems.push({
+      label: "Equipes (Squads)",
+      options: teams.map((t) => ({
+        value: `team_${t.id}`,
+        label: t.name,
+        avatar: getInitials(t.name),
+        avatarColor: getAvatarColor(t.name),
+      })),
+    });
+  }
+  if (users.length > 0) {
+    assigneeItems.push({
+      label: "Membros Individuais",
+      options: users.map((u) => ({
+        value: u.id,
+        label: u.name,
+        avatar: getInitials(u.name),
+        avatarColor: getAvatarColor(u.name),
+      })),
+    });
   }
 
   return (
@@ -190,33 +218,13 @@ export default function NewTaskForm({ users, clients, templates, teams = [] }: N
               <label className="label" htmlFor="assignedToId">
                 Responsável
               </label>
-              <select
+              <CustomSelect
                 id="assignedToId"
                 name="assignedToId"
-                className="select"
                 value={form.assignedToId}
-                onChange={handleChange}
-              >
-                <option value="">Sem responsável</option>
-                {teams.length > 0 && (
-                  <optgroup label="Equipes (Squads)">
-                    {teams.map((t) => (
-                      <option key={t.id} value={`team_${t.id}`}>
-                        {t.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-                {users.length > 0 && (
-                  <optgroup label="Membros Individuais">
-                    {users.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-              </select>
+                onChange={(value) => setForm((prev) => ({ ...prev, assignedToId: value }))}
+                items={assigneeItems}
+              />
             </div>
 
             <div className="form-group">

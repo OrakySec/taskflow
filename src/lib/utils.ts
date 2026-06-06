@@ -54,6 +54,26 @@ export function getInitials(name: string): string {
     .toUpperCase();
 }
 
+export function getAvatarColor(name: string): string {
+  const colors = [
+    "#F43F5E", // Rose
+    "#8B5CF6", // Violet
+    "#3B82F6", // Blue
+    "#10B981", // Emerald
+    "#F59E0B", // Amber
+    "#EC4899", // Pink
+    "#06B6D4", // Cyan
+    "#84CC16", // Lime
+    "#6366F1", // Indigo
+    "#14B8A6", // Teal
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
 export const PRIORITY_LABELS = {
   LOW: "Baixa",
   MEDIUM: "Média",
