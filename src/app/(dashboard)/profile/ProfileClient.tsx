@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 
 import { useSession } from "next-auth/react";
 
-const bgColors = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf", "c8f2ba", "f4d2b6", "f9c9c9", "c9f9e1", "e5c9f9"];
+const bgColors = [
+  "ff3366", "00c4cc", "ff9900", "8a2be2", "32cd32", 
+  "ff1493", "1e90ff", "ffda03", "ff4500", "9400d3", 
+  "00fa9a", "ff00ff", "00bfff", "dc143c", "adff2f"
+];
 
 // Define some predefined DiceBear avatars with colorful backgrounds
 const PREDEFINED_AVATARS = Array.from({ length: 30 }).map((_, i) => {

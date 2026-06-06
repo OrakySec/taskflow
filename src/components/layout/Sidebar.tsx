@@ -136,7 +136,7 @@ export default function Sidebar({ isOpen, isCollapsed, setIsOpen }: SidebarProps
             flex items-center gap-3 mt-2 rounded-xl transition-all
             ${isCollapsed ? "justify-center p-2" : "p-3 bg-slate-100/50 dark:bg-white/5 border border-slate-200/50 dark:border-white/10"}
           `}>
-            <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-xs font-bold text-indigo-700 dark:text-indigo-300 shrink-0">
+            <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-xs font-bold text-indigo-700 dark:text-indigo-300 shrink-0">
               {user?.avatar ? (
                 <img src={user.avatar} alt={user?.name || "Avatar"} className="w-full h-full object-cover" />
               ) : (
