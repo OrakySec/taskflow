@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -23,7 +24,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const existingTeam = await prisma.team.findFirst({
-      where: { id: params.id, companyId: user.companyId }
+      where: { id: id, companyId: user.companyId }
     });
 
     if (!existingTeam) {
@@ -31,7 +32,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 
     const team = await prisma.team.update({
-      where: { id: params.id },
+      where: { id: id },
       data: {
         name,
         description,
@@ -52,8 +53,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -71,7 +73,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const existingTeam = await prisma.team.findFirst({
-      where: { id: params.id, companyId: user.companyId }
+      where: { id: id, companyId: user.companyId }
     });
 
     if (!existingTeam) {
@@ -79,7 +81,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     }
 
     await prisma.team.delete({
-      where: { id: params.id }
+      where: { id: id }
     });
 
     return NextResponse.json({ message: "Team deleted successfully" });
