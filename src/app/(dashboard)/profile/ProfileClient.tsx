@@ -6,10 +6,13 @@ import { useRouter } from "next/navigation";
 
 import { useSession } from "next-auth/react";
 
-// Define some predefined DiceBear avatars
-const PREDEFINED_AVATARS = Array.from({ length: 30 }).map((_, i) => 
-  `https://api.dicebear.com/7.x/adventurer/svg?seed=taskflow${i + 1}`
-);
+const bgColors = ["b6e3f4", "c0aede", "d1d4f9", "ffd5dc", "ffdfbf", "c8f2ba", "f4d2b6", "f9c9c9", "c9f9e1", "e5c9f9"];
+
+// Define some predefined DiceBear avatars with colorful backgrounds
+const PREDEFINED_AVATARS = Array.from({ length: 30 }).map((_, i) => {
+  const bg = bgColors[i % bgColors.length];
+  return `https://api.dicebear.com/7.x/adventurer/svg?seed=taskflow${i + 1}&backgroundColor=${bg}`;
+});
 
 export default function ProfileClient({ user }: { user: any }) {
   const { update } = useSession();
