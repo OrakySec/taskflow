@@ -759,44 +759,47 @@ export default function TaskDetail({
                 </div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {task.attachments.map((att) => (
-                    <a
-                      key={att.id}
-                      href={att.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        padding: "10px 12px",
-                        background: "var(--bg-secondary)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "8px",
-                        textDecoration: "none",
-                        transition: "all 0.15s",
-                      }}
-                    >
-                      <Paperclip size={14} color="var(--accent-hover)" />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div
-                          style={{
-                            fontSize: "13px",
-                            color: "var(--text-primary)",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {att.filename}
+                  {task.attachments.map((att) => {
+                    const displayUrl = att.fileUrl?.replace(/^http:\/\/minio:9000/, '/minio') || '#';
+                    return (
+                      <a
+                        key={att.id}
+                        href={displayUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          padding: "10px 12px",
+                          background: "var(--bg-secondary)",
+                          border: "1px solid var(--border)",
+                          borderRadius: "8px",
+                          textDecoration: "none",
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        <Paperclip size={14} color="var(--accent-hover)" />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontSize: "13px",
+                              color: "var(--text-primary)",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {att.filename}
+                          </div>
+                          <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+                            {(att.fileSize / 1024).toFixed(0)} KB ·{" "}
+                            {formatRelativeTime(att.createdAt)}
+                          </div>
                         </div>
-                        <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
-                          {(att.fileSize / 1024).toFixed(0)} KB ·{" "}
-                          {formatRelativeTime(att.createdAt)}
-                        </div>
-                      </div>
-                    </a>
-                  ))}
+                      </a>
+                    );
+                  })}
                 </div>
               )}
             </div>

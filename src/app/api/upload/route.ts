@@ -36,8 +36,12 @@ export async function POST(request: Request) {
       // const fileUrl = `http://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}/${BUCKET_NAME}/${objectName}`;
       
       // Vamos gerar uma presigned URL válida por 7 dias, mas idealmente você 
-      // configuraria o Bucket como "Public" ou faria um proxy pelo Next.js
-      const fileUrl = await minioClient.presignedGetObject(BUCKET_NAME, objectName, 7 * 24 * 60 * 60);
+      let fileUrl = await minioClient.presignedGetObject(BUCKET_NAME, objectName, 7 * 24 * 60 * 60);
+
+      // Rewrite internal Docker hostname to Next.js proxy path so it works in the browser
+      if (fileUrl.startsWith('http://minio:9000')) {
+        fileUrl = fileUrl.replace('http://minio:9000', '/minio');
+      }
 
       uploadedFiles.push({
         filename: file.name,

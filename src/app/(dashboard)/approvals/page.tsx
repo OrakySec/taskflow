@@ -244,20 +244,21 @@ export default function ApprovalsPage() {
                     {selectedTask.attachments.map((file: any) => {
                       const isImage = file.mimeType?.startsWith('image/');
                       const isVideo = file.mimeType?.startsWith('video/');
+                      const displayUrl = file.fileUrl?.replace(/^http:\/\/minio:9000/, '/minio') || '#';
                       
                       return (
                         <div key={file.id} className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#13131a]">
                           {isImage ? (
-                            <a href={file.fileUrl} target="_blank" rel="noreferrer" className="block aspect-video">
-                              <img src={file.fileUrl} alt={file.filename} className="w-full h-full object-cover" />
+                            <a href={displayUrl} target="_blank" rel="noreferrer" className="block aspect-video">
+                              <img src={displayUrl} alt={file.filename} className="w-full h-full object-cover" />
                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                                 <span className="text-white text-xs font-medium">Ampliar</span>
                               </div>
                             </a>
                           ) : isVideo ? (
-                            <video src={file.fileUrl} controls className="w-full aspect-video object-cover" />
+                            <video src={displayUrl} controls className="w-full aspect-video object-cover" />
                           ) : (
-                            <a href={file.fileUrl} target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center aspect-video p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                            <a href={displayUrl} target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center aspect-video p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                               <Paperclip className="w-8 h-8 text-gray-400 mb-2" />
                               <span className="text-xs text-center text-gray-600 dark:text-gray-400 break-all line-clamp-2">{file.filename}</span>
                             </a>
