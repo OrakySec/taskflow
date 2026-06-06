@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Briefcase, Mail, Phone, Calendar, CheckSquare, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import ClientAccessManager from "@/components/clients/ClientAccessManager";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Detalhes do Cliente" };
@@ -36,6 +37,10 @@ export default async function ClientDetailsPage({ params }: { params: Promise<{ 
     );
   }
 
+  const clientUser = await prisma.user.findFirst({
+    where: { clientId: client.id, companyId: session.user.companyId }
+  });
+
   const openTasks = client.tasks.filter(t => t.status !== "DONE" && t.status !== "FAILED");
   const completedTasks = client.tasks.filter(t => t.status === "DONE");
 
@@ -61,29 +66,32 @@ export default async function ClientDetailsPage({ params }: { params: Promise<{ 
               </p>
             </div>
           </div>
-          {/* Pode adicionar botão de editar aqui futuramente */}
         </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px", marginBottom: "32px" }}>
-        <div className="card" style={{ padding: "24px" }}>
-          <h3 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "16px", color: "var(--text-primary)", borderBottom: "1px solid var(--border)", paddingBottom: "12px" }}>Informações de Contato</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div>
-              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}><Mail size={14} /> E-mail</div>
-              <div style={{ fontSize: "14px", color: client.email ? "var(--text-primary)" : "var(--text-muted)" }}>{client.email || "Não informado"}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}><Phone size={14} /> Telefone</div>
-              <div style={{ fontSize: "14px", color: client.phone ? "var(--text-primary)" : "var(--text-muted)" }}>{client.phone || "Não informado"}</div>
-            </div>
-            {client.notes && (
+        <div>
+          <div className="card" style={{ padding: "24px" }}>
+            <h3 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "16px", color: "var(--text-primary)", borderBottom: "1px solid var(--border)", paddingBottom: "12px" }}>Informações de Contato</h3>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div>
-                <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>Observações</div>
-                <div style={{ fontSize: "14px", color: "var(--text-primary)", whiteSpace: "pre-wrap", background: "var(--bg-secondary)", padding: "12px", borderRadius: "8px" }}>{client.notes}</div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}><Mail size={14} /> E-mail</div>
+                <div style={{ fontSize: "14px", color: client.email ? "var(--text-primary)" : "var(--text-muted)" }}>{client.email || "Não informado"}</div>
               </div>
-            )}
+              <div>
+                <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}><Phone size={14} /> Telefone</div>
+                <div style={{ fontSize: "14px", color: client.phone ? "var(--text-primary)" : "var(--text-muted)" }}>{client.phone || "Não informado"}</div>
+              </div>
+              {client.notes && (
+                <div>
+                  <div style={{ fontSize: "12px", color: "var(--text-muted)", marginBottom: "4px" }}>Observações</div>
+                  <div style={{ fontSize: "14px", color: "var(--text-primary)", whiteSpace: "pre-wrap", background: "var(--bg-secondary)", padding: "12px", borderRadius: "8px" }}>{client.notes}</div>
+                </div>
+              )}
+            </div>
           </div>
+
+          <ClientAccessManager clientId={client.id} clientEmail={client.email} hasAccess={!!clientUser} />
         </div>
 
         <div className="card" style={{ padding: "24px" }}>
