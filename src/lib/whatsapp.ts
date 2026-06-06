@@ -44,6 +44,8 @@ export async function sendWhatsAppMessage({
 }: SendMessageOptions) {
   const chatId = targetId || config.groupId;
 
+  console.log(`[WhatsApp API] Sending message. targetId: "${targetId}", fallback groupId: "${config.groupId}", final chatId: "${chatId}"`);
+
   return evolutionRequest(config, `/message/sendText/taskflow`, {
     number: chatId,
     text: message,

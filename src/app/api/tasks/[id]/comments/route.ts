@@ -77,7 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: Params }) {
       for (const u of usersToNotify) {
         if (u.notifyTelegram || u.notifyWhatsapp) {
           const msg = `*${session.user.name}* mencionou você na tarefa *${task.title}*.\n\nAcesse: ${process.env.NEXT_PUBLIC_APP_URL}/tasks/${taskId}`;
-          await sendPersonalNotification(session.user.companyId, u, msg);
+          await sendPersonalNotification(session.user.companyId, u, msg, false);
         }
       }
     }

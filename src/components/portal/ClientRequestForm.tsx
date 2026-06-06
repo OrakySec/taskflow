@@ -40,7 +40,8 @@ export default function ClientRequestForm({ onSuccess }: { onSuccess?: () => voi
         });
 
         if (!uploadRes.ok) {
-          throw new Error("Erro ao fazer upload dos anexos.");
+          const errData = await uploadRes.json().catch(() => ({}));
+          throw new Error(errData.error || "Erro ao fazer upload dos anexos.");
         }
 
         const uploadData = await uploadRes.json();

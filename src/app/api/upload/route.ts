@@ -48,8 +48,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ files: uploadedFiles }, { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erro no upload:', error);
-    return NextResponse.json({ error: 'Falha ao processar o upload.' }, { status: 500 });
+    return NextResponse.json({ error: 'Falha ao processar o upload: ' + (error.message || 'Erro desconhecido') }, { status: 500 });
   }
 }
