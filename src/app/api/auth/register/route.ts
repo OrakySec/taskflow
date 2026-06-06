@@ -21,10 +21,12 @@ function generateSlug(name: string): string {
 
 export async function POST(req: NextRequest) {
   // Desativado temporariamente
-  return NextResponse.json(
-    { error: "A criação de novas contas está temporariamente desativada. O sistema é restrito apenas a convidados no momento." },
-    { status: 403 }
-  );
+  if (process.env.DISABLE_REGISTRATION !== "false") {
+    return NextResponse.json(
+      { error: "A criação de novas contas está temporariamente desativada. O sistema é restrito apenas a convidados no momento." },
+      { status: 403 }
+    );
+  }
 
   try {
     const body = await req.json();
