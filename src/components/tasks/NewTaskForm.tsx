@@ -113,6 +113,18 @@ export default function NewTaskForm({ users, clients, templates, teams = [] }: N
     });
   }
 
+  const priorityItems: SelectItem[] = [
+    { value: "LOW", label: "🟢 Baixa" },
+    { value: "MEDIUM", label: "🟡 Média" },
+    { value: "HIGH", label: "🟠 Alta" },
+    { value: "URGENT", label: "🔴 Urgente" },
+  ];
+
+  const clientItems: SelectItem[] = [
+    { value: "", label: "Sem cliente" },
+    ...clients.map((c) => ({ value: c.id, label: c.name })),
+  ];
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="card" style={{ padding: "28px" }}>
@@ -183,18 +195,13 @@ export default function NewTaskForm({ users, clients, templates, teams = [] }: N
               <label className="label" htmlFor="priority">
                 Prioridade *
               </label>
-              <select
+              <CustomSelect
                 id="priority"
                 name="priority"
-                className="select"
                 value={form.priority}
-                onChange={handleChange}
-              >
-                <option value="LOW">🟢 Baixa</option>
-                <option value="MEDIUM">🟡 Média</option>
-                <option value="HIGH">🟠 Alta</option>
-                <option value="URGENT">🔴 Urgente</option>
-              </select>
+                onChange={(value) => setForm((prev) => ({ ...prev, priority: value }))}
+                items={priorityItems}
+              />
             </div>
 
             <div className="form-group">

@@ -70,75 +70,35 @@ export default function CustomSelect({
         type="button"
         id={id}
         name={name}
-        className="input"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "100%",
-          textAlign: "left",
-          cursor: "pointer",
-          background: "var(--bg-secondary)",
-          color: value ? "var(--text-primary)" : "var(--text-muted)",
-        }}
+        className="input w-full flex items-center justify-between text-left cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <span className="truncate pr-4" style={{ color: value ? "inherit" : "inherit" }}>
           {selectedLabel}
         </span>
-        <ChevronDown size={16} style={{ color: "var(--text-muted)", flexShrink: 0, transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "none" }} />
+        <ChevronDown size={16} className={`shrink-0 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       {isOpen && (
         <div
-          style={{
-            position: "absolute",
-            top: "calc(100% + 4px)",
-            left: 0,
-            right: 0,
-            zIndex: 50,
-            background: "var(--bg-tertiary)",
-            border: "1px solid var(--border)",
-            borderRadius: "8px",
-            boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3)",
-            maxHeight: "300px",
-            overflowY: "auto",
-            padding: "4px",
-            animation: "fadeIn 0.15s ease-out",
-          }}
+          className="absolute z-50 w-full mt-1 bg-white dark:bg-[#181824] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-[300px] overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100"
+          style={{ top: "100%", left: 0 }}
         >
           {items.map((item, index) => {
             if ("options" in item) {
               return (
-                <div key={index} style={{ marginBottom: index < items.length - 1 ? "8px" : 0 }}>
-                  <div style={{ padding: "8px 12px", fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", color: "var(--text-muted)" }}>
+                <div key={index} className={index < items.length - 1 ? "mb-2" : ""}>
+                  <div className="px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {item.label}
                   </div>
                   {item.options.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
-                        padding: "10px 12px",
-                        background: value === opt.value ? "var(--accent-subtle)" : "transparent",
-                        color: value === opt.value ? "var(--accent-hover)" : "var(--text-primary)",
-                        border: "none",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        textAlign: "left",
-                        fontSize: "14px",
-                        transition: "background 0.15s, color 0.15s",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (value !== opt.value) e.currentTarget.style.background = "var(--bg-secondary)";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (value !== opt.value) e.currentTarget.style.background = "transparent";
-                      }}
+                      className={`flex items-center justify-between w-full px-3 py-2.5 text-sm rounded-lg cursor-pointer text-left transition-colors
+                        ${value === opt.value 
+                          ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" 
+                          : "text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"}`}
                       onClick={() => {
                         onChange(opt.value);
                         setIsOpen(false);
@@ -152,7 +112,7 @@ export default function CustomSelect({
                         )}
                         {opt.label}
                       </div>
-                      {value === opt.value && <Check size={16} />}
+                  {value === opt.value && <Check size={16} />}
                     </button>
                   ))}
                 </div>
@@ -162,27 +122,10 @@ export default function CustomSelect({
                 <button
                   key={item.value}
                   type="button"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    padding: "10px 12px",
-                    background: value === item.value ? "var(--accent-subtle)" : "transparent",
-                    color: value === item.value ? "var(--accent-hover)" : "var(--text-primary)",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    fontSize: "14px",
-                    transition: "background 0.1s, color 0.1s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (value !== item.value) e.currentTarget.style.background = "var(--bg-secondary)";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (value !== item.value) e.currentTarget.style.background = "transparent";
-                  }}
+                  className={`flex items-center justify-between w-full px-3 py-2.5 text-sm rounded-lg cursor-pointer text-left transition-colors
+                    ${value === item.value 
+                      ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" 
+                      : "text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5"}`}
                   onClick={() => {
                     onChange(item.value);
                     setIsOpen(false);

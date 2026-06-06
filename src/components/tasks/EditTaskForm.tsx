@@ -102,6 +102,24 @@ export default function EditTaskForm({ task, users, teams = [], clients }: EditT
     });
   }
 
+  const statusItems: SelectItem[] = [
+    { value: "OPEN", label: "Aberta" },
+    { value: "IN_PROGRESS", label: "Em andamento" },
+    { value: "DONE", label: "Concluída" },
+  ];
+
+  const priorityItems: SelectItem[] = [
+    { value: "LOW", label: "🟢 Baixa" },
+    { value: "MEDIUM", label: "🟡 Média" },
+    { value: "HIGH", label: "🟠 Alta" },
+    { value: "URGENT", label: "🔴 Urgente" },
+  ];
+
+  const clientItems: SelectItem[] = [
+    { value: "", label: "Sem cliente" },
+    ...clients.map((c) => ({ value: c.id, label: c.name })),
+  ];
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="card" style={{ padding: "28px" }}>
@@ -139,26 +157,36 @@ export default function EditTaskForm({ task, users, teams = [], clients }: EditT
             />
           </div>
 
-          {/* Priority + Deadline row */}
+          {/* Status + Priority row */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <div className="form-group">
+              <label className="label" htmlFor="status">
+                Status *
+              </label>
+              <CustomSelect
+                id="status"
+                name="status"
+                value={form.status}
+                onChange={(value) => setForm((prev) => ({ ...prev, status: value }))}
+                items={statusItems}
+              />
+            </div>
             <div className="form-group">
               <label className="label" htmlFor="priority">
                 Prioridade *
               </label>
-              <select
+              <CustomSelect
                 id="priority"
                 name="priority"
-                className="select"
                 value={form.priority}
-                onChange={handleChange}
-              >
-                <option value="LOW">🟢 Baixa</option>
-                <option value="MEDIUM">🟡 Média</option>
-                <option value="HIGH">🟠 Alta</option>
-                <option value="URGENT">🔴 Urgente</option>
-              </select>
+                onChange={(value) => setForm((prev) => ({ ...prev, priority: value }))}
+                items={priorityItems}
+              />
             </div>
+          </div>
 
+          {/* Deadline + Client row */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
             <div className="form-group">
               <label className="label" htmlFor="deadline">
                 Prazo
@@ -172,42 +200,32 @@ export default function EditTaskForm({ task, users, teams = [], clients }: EditT
                 onChange={handleChange}
               />
             </div>
-          </div>
-
-          {/* Assigned to + Client */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-            <div className="form-group">
-              <label className="label" htmlFor="assignedToId">
-                Responsável
-              </label>
-              <CustomSelect
-                id="assignedToId"
-                name="assignedToId"
-                value={form.assignedToId}
-                onChange={(value) => setForm((prev) => ({ ...prev, assignedToId: value }))}
-                items={assigneeItems}
-              />
-            </div>
-
             <div className="form-group">
               <label className="label" htmlFor="clientId">
                 Cliente
               </label>
-              <select
+              <CustomSelect
                 id="clientId"
                 name="clientId"
-                className="select"
                 value={form.clientId}
-                onChange={handleChange}
-              >
-                <option value="">Sem cliente</option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setForm((prev) => ({ ...prev, clientId: value }))}
+                items={clientItems}
+              />
             </div>
+          </div>
+
+          {/* Assigned To row */}
+          <div className="form-group">
+            <label className="label" htmlFor="assignedToId">
+              Responsável
+            </label>
+            <CustomSelect
+              id="assignedToId"
+              name="assignedToId"
+              value={form.assignedToId}
+              onChange={(value) => setForm((prev) => ({ ...prev, assignedToId: value }))}
+              items={assigneeItems}
+            />
           </div>
         </div>
 
