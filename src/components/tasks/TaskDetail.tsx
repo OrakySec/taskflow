@@ -73,6 +73,7 @@ interface Task {
   createdAt: Date;
   updatedAt: Date;
   assignedTo: User | null;
+  assignedTeam?: { id: string; name: string } | null;
   client: { id: string; name: string } | null;
   createdBy: User;
   template: { id: string; name: string } | null;
@@ -850,7 +851,33 @@ export default function TaskDetail({
                 </span>
               </div>
 
-              {task.assignedTo && (
+              {task.assignedTeam ? (
+                <div>
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      color: "var(--text-muted)",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    Equipe Responsável
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <div className="w-6 h-6 rounded-full bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-400 overflow-hidden shrink-0">
+                      {getInitials(task.assignedTeam.name)}
+                    </div>
+                    <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+                      {task.assignedTeam.name}
+                    </span>
+                  </div>
+                </div>
+              ) : task.assignedTo && (
                 <div>
                   <div
                     style={{
@@ -868,7 +895,7 @@ export default function TaskDetail({
                       gap: "6px",
                     }}
                   >
-                    <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-300 overflow-hidden shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-700 dark:text-slate-300 overflow-hidden shrink-0">
                       {task.assignedTo.avatar ? (
                         <img src={task.assignedTo.avatar} alt={task.assignedTo.name} className="w-full h-full object-cover" />
                       ) : (

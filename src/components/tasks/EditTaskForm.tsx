@@ -13,13 +13,15 @@ interface EditTaskFormProps {
     priority: string;
     deadline: Date | null;
     assignedToId: string | null;
+    assignedTeamId?: string | null;
     clientId: string | null;
   };
   users: { id: string; name: string }[];
+  teams?: { id: string; name: string }[];
   clients: { id: string; name: string }[];
 }
 
-export default function EditTaskForm({ task, users, clients }: EditTaskFormProps) {
+export default function EditTaskForm({ task, users, teams = [], clients }: EditTaskFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,7 +29,7 @@ export default function EditTaskForm({ task, users, clients }: EditTaskFormProps
     title: task.title,
     description: task.description || "",
     priority: task.priority,
-    assignedToId: task.assignedToId || "",
+    assignedToId: task.assignedTeamId ? `team_${task.assignedTeamId}` : (task.assignedToId || ""),
     clientId: task.clientId || "",
     deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : "",
   });
@@ -43,9 +45,14 @@ export default function EditTaskForm({ task, users, clients }: EditTaskFormProps
     setLoading(true);
     setError("");
 
+    const isTeam = form.assignedToId?.startsWith("team_");
+    const assignedTeamId = isTeam ? form.assignedToId.replace("team_", "") : null;
+    const assignedUserId = !isTeam && form.assignedToId ? form.assignedToId : null;
+
     const body = {
       ...form,
-      assignedToId: form.assignedToId || null,
+      assignedToId: assignedUserId,
+      assignedTeamId,
       clientId: form.clientId || null,
       deadline: form.deadline ? new Date(form.deadline).toISOString() : null,
     };
@@ -153,11 +160,24 @@ export default function EditTaskForm({ task, users, clients }: EditTaskFormProps
                 onChange={handleChange}
               >
                 <option value="">Sem responsável</option>
-                {users.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.name}
-                  </option>
-                ))}
+                {teams.length > 0 && (
+                  <optgroup label="Equipes (Squads)">
+                    {teams.map((t) => (
+                      <option key={t.id} value={`team_${t.id}`}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                {users.length > 0 && (
+                  <optgroup label="Membros Individuais">
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
             </div>
 

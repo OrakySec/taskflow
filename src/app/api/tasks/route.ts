@@ -12,6 +12,7 @@ const createTaskSchema = z.object({
   description: z.string().optional().nullable(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).default("MEDIUM"),
   assignedToId: z.string().optional().nullable(),
+  assignedTeamId: z.string().optional().nullable(),
   clientId: z.string().optional().nullable(),
   deadline: z.string().optional().nullable(),
   templateId: z.string().optional().nullable(),
@@ -32,17 +33,40 @@ export async function GET(req: NextRequest) {
   };
 
   const isAdmin = session.user.role === "ADMIN" || session.user.role === "MANAGER";
-  if (!isAdmin) where.assignedToId = session.user.id;
+  
+  if (!isAdmin) {
+    const userWithTeams = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { teams: { select: { id: true } } }
+    });
+    const teamIds = userWithTeams?.teams.map(t => t.id) || [];
+    
+    // Removendo a atribuição direta e usando OR para incluir time
+    delete where.assignedToId;
+    
+    // Se assignedTo veio no filtro da URL, sobrescreve tudo
+    if (assignedTo) {
+      where.assignedToId = assignedTo;
+    } else {
+      where.OR = [
+        { assignedToId: session.user.id },
+        { assignedTeamId: { in: teamIds } }
+      ];
+    }
+  } else {
+    if (assignedTo) where.assignedToId = assignedTo;
+  }
+  
   if (status) where.status = status;
   if (priority) where.priority = priority;
-  if (assignedTo) where.assignedToId = assignedTo;
   if (clientId) where.clientId = clientId;
 
   const tasks = await prisma.task.findMany({
     where,
     orderBy: [{ priority: "desc" }, { deadline: "asc" }, { createdAt: "desc" }],
     include: {
-      assignedTo: { select: { id: true, name: true } },
+      assignedTo: { select: { id: true, name: true, avatar: true } },
+      assignedTeam: { select: { id: true, name: true } },
       client: { select: { id: true, name: true } },
       _count: { select: { comments: true, attachments: true } },
     },
@@ -77,6 +101,7 @@ export async function POST(req: NextRequest) {
         description: data.description,
         priority: data.priority,
         assignedToId: data.assignedToId || null,
+        assignedTeamId: data.assignedTeamId || null,
         clientId: data.clientId || null,
         deadline: data.deadline ? new Date(data.deadline) : null,
         templateId: data.templateId || null,
@@ -85,6 +110,7 @@ export async function POST(req: NextRequest) {
       },
       include: {
         assignedTo: { select: { name: true } },
+        assignedTeam: { select: { name: true } },
         client: { select: { name: true } },
         createdBy: { select: { name: true } },
       },
@@ -100,7 +126,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Notificação interna para o responsável
+    // Notificação interna para o responsável (individual)
     if (task.assignedToId && task.assignedToId !== session.user.id) {
       await prisma.notification.create({
         data: {
@@ -113,11 +139,35 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Notificação interna para a equipe
+    if (task.assignedTeamId) {
+      const teamWithMembers = await prisma.team.findUnique({
+        where: { id: task.assignedTeamId },
+        include: { members: { select: { id: true } } }
+      });
+      if (teamWithMembers) {
+        const notificationsToCreate = teamWithMembers.members
+          .filter(m => m.id !== session.user.id)
+          .map(m => ({
+            userId: m.id,
+            companyId: session.user.companyId,
+            type: "TASK_ASSIGNED",
+            title: "Nova tarefa para equipe",
+            body: `A equipe ${task.assignedTeam?.name} recebeu: ${task.title}`,
+            link: `/tasks/${task.id}`,
+          }));
+        
+        if (notificationsToCreate.length > 0) {
+          await prisma.notification.createMany({ data: notificationsToCreate });
+        }
+      }
+    }
+
     // Notificação externa (WhatsApp + Telegram)
     const message = buildTaskCreatedMessage({
       title: task.title,
       priority: task.priority,
-      assignedTo: task.assignedTo?.name,
+      assignedTo: task.assignedTeam ? `Equipe ${task.assignedTeam.name}` : task.assignedTo?.name,
       client: task.client?.name,
       deadline: task.deadline,
       createdBy: task.createdBy.name,

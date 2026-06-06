@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   Zap,
+  Network,
 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
@@ -23,7 +24,8 @@ const navItems = [
   { href: "/clients", label: "Clientes", icon: Briefcase },
   { href: "/templates", label: "Templates", icon: LayoutTemplate },
   { href: "/recurring", label: "Recorrentes", icon: RefreshCw },
-  { href: "/users", label: "Equipe", icon: Users },
+  { href: "/teams", label: "Equipes (Squads)", icon: Network },
+  { href: "/users", label: "Usuários", icon: Users },
 ];
 
 const bottomItems = [

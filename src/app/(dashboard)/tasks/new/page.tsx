@@ -13,7 +13,7 @@ export default async function NewTaskPage() {
   const isAdmin = session.user.role === "ADMIN" || session.user.role === "MANAGER";
   if (!isAdmin) redirect("/tasks");
 
-  const [users, clients, templates] = await Promise.all([
+  const [users, clients, templates, teams] = await Promise.all([
     prisma.user.findMany({
       where: { companyId: session.user.companyId, isActive: true },
       select: { id: true, name: true },
@@ -29,6 +29,11 @@ export default async function NewTaskPage() {
       select: { id: true, name: true, title: true, description: true, priority: true },
       orderBy: { name: "asc" },
     }),
+    prisma.team.findMany({
+      where: { companyId: session.user.companyId },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" }
+    })
   ]);
 
   return (
@@ -37,7 +42,7 @@ export default async function NewTaskPage() {
         <h1 className="page-title">Nova Tarefa</h1>
         <p className="page-subtitle">Preencha os dados da tarefa abaixo.</p>
       </div>
-      <NewTaskForm users={users} clients={clients} templates={templates} />
+      <NewTaskForm users={users} clients={clients} templates={templates} teams={teams} />
     </div>
   );
 }

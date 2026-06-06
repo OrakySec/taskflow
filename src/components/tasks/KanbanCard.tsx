@@ -17,6 +17,7 @@ interface KanbanCardProps {
     createdAt: Date;
     client: { name: string } | null;
     assignedTo: { id: string; name: string; avatar?: string | null } | null;
+    assignedTeam?: { id: string; name: string } | null;
     _count: { comments: number; attachments: number };
   };
 }
@@ -88,10 +89,12 @@ export default function KanbanCard({ task }: KanbanCardProps) {
               {task._count.attachments > 0 && <span className="flex items-center gap-0.5"><Paperclip size={12} /> {task._count.attachments}</span>}
             </div>
           )}
-        </div>
-
-        {task.assignedTo ? (
-          <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-300 ml-auto shrink-0 overflow-hidden" title={task.assignedTo.name}>
+        {task.assignedTeam ? (
+          <div className="w-6 h-6 rounded-full bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 flex items-center justify-center text-[10px] font-bold text-indigo-700 dark:text-indigo-400 ml-auto shrink-0 overflow-hidden" title={`Equipe: ${task.assignedTeam.name}`}>
+            {getInitials(task.assignedTeam.name)}
+          </div>
+        ) : task.assignedTo ? (
+          <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-700 dark:text-slate-300 ml-auto shrink-0 overflow-hidden" title={task.assignedTo.name}>
             {task.assignedTo.avatar ? (
               <img src={task.assignedTo.avatar} alt={task.assignedTo.name} className="w-full h-full object-cover" />
             ) : (
@@ -99,7 +102,7 @@ export default function KanbanCard({ task }: KanbanCardProps) {
             )}
           </div>
         ) : (
-          <div className="avatar avatar-sm bg-transparent border border-dashed border-slate-300 dark:border-slate-600 text-slate-400" title="Não atribuído">
+          <div className="w-6 h-6 rounded-full bg-transparent border border-dashed border-slate-300 dark:border-slate-600 flex items-center justify-center text-[10px] text-slate-400 ml-auto shrink-0" title="Não atribuído">
             ?
           </div>
         )}

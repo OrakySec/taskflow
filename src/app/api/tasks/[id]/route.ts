@@ -13,6 +13,7 @@ const updateTaskSchema = z.object({
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
   status: z.enum(["OPEN", "IN_PROGRESS", "DONE", "FAILED"]).optional(),
   assignedToId: z.string().optional().nullable(),
+  assignedTeamId: z.string().optional().nullable(),
   clientId: z.string().optional().nullable(),
   deadline: z.string().optional().nullable(),
   failureReason: z.string().optional().nullable(),
@@ -125,6 +126,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
         newValue: data.assignedToId || undefined,
       });
     }
+    
+    if ("assignedTeamId" in data && data.assignedTeamId !== task.assignedTeamId) {
+      historyEntries.push({
+        action: "ASSIGNED_TEAM",
+        oldValue: task.assignedTeamId || undefined,
+        newValue: data.assignedTeamId || undefined,
+      });
+    }
 
     // Prepare update data
     const updateData: Record<string, unknown> = { ...data };
@@ -156,6 +165,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Params }) {
       data: updateData,
       include: {
         assignedTo: { select: { name: true } },
+        assignedTeam: { select: { name: true } },
         client: { select: { name: true } },
         createdBy: { select: { name: true } },
       },

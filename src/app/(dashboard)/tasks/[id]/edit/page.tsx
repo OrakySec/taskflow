@@ -23,13 +23,14 @@ export default async function EditTaskPage({ params }: { params: Params }) {
       priority: true,
       deadline: true,
       assignedToId: true,
+      assignedTeamId: true,
       clientId: true,
     },
   });
 
   if (!task) redirect("/tasks");
 
-  const [users, clients] = await Promise.all([
+  const [users, clients, teams] = await Promise.all([
     prisma.user.findMany({
       where: { companyId: session.user.companyId, isActive: true },
       select: { id: true, name: true },
@@ -37,6 +38,11 @@ export default async function EditTaskPage({ params }: { params: Params }) {
     }),
     prisma.client.findMany({
       where: { companyId: session.user.companyId, isActive: true },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.team.findMany({
+      where: { companyId: session.user.companyId },
       select: { id: true, name: true },
       orderBy: { name: "asc" },
     }),
@@ -66,6 +72,7 @@ export default async function EditTaskPage({ params }: { params: Params }) {
           priority: task.priority as string,
         }}
         users={users}
+        teams={teams}
         clients={clients}
       />
     </div>

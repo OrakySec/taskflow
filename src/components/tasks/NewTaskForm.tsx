@@ -15,9 +15,10 @@ interface NewTaskFormProps {
     description: string | null;
     priority: string;
   }[];
+  teams?: { id: string; name: string }[];
 }
 
-export default function NewTaskForm({ users, clients, templates }: NewTaskFormProps) {
+export default function NewTaskForm({ users, clients, templates, teams = [] }: NewTaskFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -54,9 +55,14 @@ export default function NewTaskForm({ users, clients, templates }: NewTaskFormPr
     setLoading(true);
     setError("");
 
+    const isTeam = form.assignedToId?.startsWith("team_");
+    const assignedTeamId = isTeam ? form.assignedToId.replace("team_", "") : null;
+    const assignedUserId = !isTeam && form.assignedToId ? form.assignedToId : null;
+
     const body = {
       ...form,
-      assignedToId: form.assignedToId || null,
+      assignedToId: assignedUserId,
+      assignedTeamId,
       clientId: form.clientId || null,
       templateId: form.templateId || null,
       deadline: form.deadline ? new Date(form.deadline).toISOString() : null,
@@ -192,11 +198,24 @@ export default function NewTaskForm({ users, clients, templates }: NewTaskFormPr
                 onChange={handleChange}
               >
                 <option value="">Sem responsável</option>
-                {users.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.name}
-                  </option>
-                ))}
+                {teams.length > 0 && (
+                  <optgroup label="Equipes (Squads)">
+                    {teams.map((t) => (
+                      <option key={t.id} value={`team_${t.id}`}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+                {users.length > 0 && (
+                  <optgroup label="Membros Individuais">
+                    {users.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
             </div>
 
