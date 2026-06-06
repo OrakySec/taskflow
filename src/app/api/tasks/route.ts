@@ -16,6 +16,12 @@ const createTaskSchema = z.object({
   clientId: z.string().optional().nullable(),
   deadline: z.string().optional().nullable(),
   templateId: z.string().optional().nullable(),
+  attachments: z.array(z.object({
+    filename: z.string(),
+    fileUrl: z.string(),
+    fileSize: z.number(),
+    mimeType: z.string()
+  })).optional().nullable(),
 });
 
 export async function GET(req: NextRequest) {
@@ -80,7 +86,11 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
 
   const isAdmin = session.user.role === "ADMIN" || session.user.role === "MANAGER";
-  if (!isAdmin) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
+  const isClient = session.user.role === "CLIENT";
+  
+  // Clients can create tasks (requests), collaborators currently cannot unless changed.
+  // We'll allow ADMIN, MANAGER, and CLIENT.
+  if (!isAdmin && !isClient) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
 
   try {
     const body = await req.json();
@@ -95,18 +105,35 @@ export async function POST(req: NextRequest) {
 
     const data = parsed.data;
 
+    let userClientId = data.clientId || null;
+    let taskStatus = "OPEN";
+    
+    // Se for cliente criando, força o clientId dele e o status DRAFT
+    if (isClient) {
+      const userObj = await prisma.user.findUnique({ where: { id: session.user.id } });
+      if (!userObj || !userObj.clientId) {
+        return NextResponse.json({ error: "Cliente não configurado no perfil." }, { status: 400 });
+      }
+      userClientId = userObj.clientId;
+      taskStatus = "DRAFT";
+    }
+
     const task = await prisma.task.create({
       data: {
         title: data.title,
         description: data.description,
         priority: data.priority,
-        assignedToId: data.assignedToId || null,
-        assignedTeamId: data.assignedTeamId || null,
-        clientId: data.clientId || null,
+        status: taskStatus as any,
+        assignedToId: isClient ? null : (data.assignedToId || null),
+        assignedTeamId: isClient ? null : (data.assignedTeamId || null),
+        clientId: userClientId,
         deadline: data.deadline ? new Date(data.deadline) : null,
         templateId: data.templateId || null,
         companyId: session.user.companyId,
         createdById: session.user.id,
+        attachments: data.attachments?.length ? {
+          create: data.attachments
+        } : undefined
       },
       include: {
         assignedTo: { select: { name: true } },

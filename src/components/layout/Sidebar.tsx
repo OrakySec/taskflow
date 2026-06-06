@@ -14,18 +14,22 @@ import {
   LogOut,
   Zap,
   Network,
+  Inbox,
+  Monitor
 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/tasks", label: "Tarefas", icon: CheckSquare },
-  { href: "/clients", label: "Clientes", icon: Briefcase },
-  { href: "/templates", label: "Templates", icon: LayoutTemplate },
-  { href: "/recurring", label: "Recorrentes", icon: RefreshCw },
-  { href: "/teams", label: "Equipes (Squads)", icon: Network },
-  { href: "/users", label: "Usuários", icon: Users },
+const baseNavItems = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
+  { href: "/portal", label: "Meu Portal", icon: Monitor, roles: ["CLIENT"] },
+  { href: "/approvals", label: "Aprovações", icon: Inbox, roles: ["ADMIN", "MANAGER"] },
+  { href: "/tasks", label: "Tarefas", icon: CheckSquare, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
+  { href: "/clients", label: "Clientes", icon: Briefcase, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
+  { href: "/templates", label: "Templates", icon: LayoutTemplate, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
+  { href: "/recurring", label: "Recorrentes", icon: RefreshCw, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
+  { href: "/teams", label: "Equipes (Squads)", icon: Network, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
+  { href: "/users", label: "Usuários", icon: Users, roles: ["ADMIN", "MANAGER"] },
 ];
 
 const bottomItems = [
@@ -42,6 +46,10 @@ export default function Sidebar({ isOpen, isCollapsed, setIsOpen }: SidebarProps
   const pathname = usePathname();
   const { data: session } = useSession();
   const user = session?.user;
+
+  const navItems = baseNavItems.filter(item => 
+    !item.roles || item.roles.includes(user?.role || "COLLABORATOR")
+  );
 
   return (
     <aside
@@ -153,7 +161,7 @@ export default function Sidebar({ isOpen, isCollapsed, setIsOpen }: SidebarProps
                     {user?.name}
                   </div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                    {user?.role === "ADMIN" ? "Admin" : user?.role === "MANAGER" ? "Gerente" : "Colaborador"}
+                    {user?.role === "ADMIN" ? "Admin" : user?.role === "MANAGER" ? "Gerente" : user?.role === "CLIENT" ? "Cliente" : "Colaborador"}
                   </div>
                 </div>
                 <button
