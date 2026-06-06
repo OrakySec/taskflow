@@ -155,7 +155,7 @@ export default function ProfileClient({ user }: { user: any }) {
                   Notificações no Telegram
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Receba avisos quando for mencionado ou receber tarefas no Telegram. (Bot de integração em breve)
+                  Receba avisos do nosso Bot Oficial quando for mencionado ou receber tarefas no Telegram.
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer mt-1 flex-shrink-0">
