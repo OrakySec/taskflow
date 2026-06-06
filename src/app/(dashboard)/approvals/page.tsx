@@ -275,7 +275,7 @@ export default function ApprovalsPage() {
 
             {/* Direita: Controles e Rejeição */}
             <div className="space-y-4">
-              <>
+              {!isRejecting ? (
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Prazo de Entrega</label>
@@ -307,9 +307,7 @@ export default function ApprovalsPage() {
                     />
                   </div>
                 </div>
-              </>
-            ) : (
-              <>
+              ) : (
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -324,8 +322,7 @@ export default function ApprovalsPage() {
                     />
                   </div>
                 </div>
-              </>
-            )}
+              )}
             </div>
           </div>
         </div>
