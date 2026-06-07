@@ -19,18 +19,24 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    if (result?.error) {
-      setError("E-mail ou senha incorretos.");
+      if (result?.error) {
+        setError("E-mail ou senha incorretos.");
+        setLoading(false);
+      } else {
+        // Usar window.location.href garante que o cache do Next.js App Router seja ignorado e a página recarregue buscando a nova sessão
+        window.location.href = "/";
+      }
+    } catch (err: any) {
+      console.error("Erro ao fazer login:", err);
+      setError(err?.message || "Erro de conexão ao tentar fazer login. Tente novamente.");
       setLoading(false);
-    } else {
-      router.push("/");
-      router.refresh();
     }
   }
 
