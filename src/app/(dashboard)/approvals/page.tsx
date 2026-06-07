@@ -205,66 +205,82 @@ export default function ApprovalsPage() {
       </div>
 
       {selectedTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#1a1a24] rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div className="p-6 border-b border-gray-100 dark:border-gray-800 shrink-0">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Aprovar Solicitação</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md">
+          <div className="bg-white dark:bg-[#1a1a24] rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col border border-gray-100 dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-800 shrink-0 flex justify-between items-center bg-gray-50/50 dark:bg-[#13131a]/50">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <CheckCircle className="w-6 h-6 text-[#8b5cf6]" />
+                Aprovar Solicitação
+              </h2>
+              <button onClick={() => setSelectedTask(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </button>
             </div>
             
-            <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Esquerda: Informações da Tarefa */}
-                <div className="space-y-4">
-              <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Título</label>
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#8b5cf6]"
-                />
-              </div>
-              <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
-                <textarea
-                  rows={3}
-                  value={editDescription}
-                  onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full bg-gray-50 dark:bg-[#13131a] border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-2 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#8b5cf6] resize-none"
-                />
-              </div>
+            <div className="p-6 md:p-8 overflow-y-auto flex-1 custom-scrollbar">
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                {/* Esquerda: Informações da Tarefa (Ocupa mais espaço) */}
+                <div className="lg:col-span-3 space-y-6">
+                  <div className="bg-gray-50 dark:bg-[#13131a] p-5 rounded-2xl border border-gray-100 dark:border-gray-800">
+                    <div className="mb-4">
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Título da Tarefa</label>
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="w-full bg-white dark:bg-[#1a1a24] border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#8b5cf6] font-medium text-lg transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Descrição Detalhada</label>
+                      <textarea
+                        rows={5}
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        className="w-full bg-white dark:bg-[#1a1a24] border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#8b5cf6] resize-none transition-all"
+                      />
+                    </div>
+                  </div>
               
               {selectedTask.attachments && selectedTask.attachments.length > 0 && (
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                    <Paperclip className="w-4 h-4 text-gray-500" />
-                    Anexos ({selectedTask.attachments.length})
+                <div className="pt-2">
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2 uppercase tracking-wider">
+                    <Paperclip className="w-4 h-4 text-[#8b5cf6]" />
+                    Anexos e Mídias ({selectedTask.attachments.length})
                   </h4>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {selectedTask.attachments.map((file: any) => {
                       const isImage = file.mimeType?.startsWith('image/');
                       const isVideo = file.mimeType?.startsWith('video/');
-                      const displayUrl = file.fileUrl?.replace(/^http:\/\/minio:9000/, '/api/minio') || '#';
+                      // Consertar URL se usar minio:9000 ou localhost:9000
+                      const displayUrl = file.fileUrl?.replace(/^http:\/\/(minio|localhost):9000/, '/api/minio') || '#';
                       
                       return (
-                        <div key={file.id} className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#13131a]">
+                        <div key={file.id} className="relative group rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#13131a] shadow-sm hover:shadow-md transition-all">
                           {isImage ? (
-                            <a href={displayUrl} target="_blank" rel="noreferrer" className="block aspect-video">
-                              <img src={displayUrl} alt={file.filename} className="w-full h-full object-cover" />
+                            <a href={displayUrl} target="_blank" rel="noreferrer" className="block aspect-[4/3] bg-gray-200 dark:bg-gray-800">
+                              <img src={displayUrl} alt={file.filename} className="w-full h-full object-contain" onError={(e) => {
+                                // Fallback icon if image breaks
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                (e.target as HTMLImageElement).parentElement!.innerHTML += '<div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span class="text-xs mt-2">Erro ao carregar</span></div>';
+                              }} />
                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <span className="text-white text-xs font-medium">Ampliar</span>
+                                <span className="text-white text-sm font-medium flex items-center gap-2">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                                  Ampliar
+                                </span>
                               </div>
                             </a>
                           ) : isVideo ? (
-                            <video src={displayUrl} controls className="w-full aspect-video object-cover" />
+                            <video src={displayUrl} controls className="w-full aspect-[4/3] object-contain bg-black" />
                           ) : (
-                            <a href={displayUrl} target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center aspect-video p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                              <Paperclip className="w-8 h-8 text-gray-400 mb-2" />
-                              <span className="text-xs text-center text-gray-600 dark:text-gray-400 break-all line-clamp-2">{file.filename}</span>
+                            <a href={displayUrl} target="_blank" rel="noreferrer" className="flex flex-col items-center justify-center aspect-[4/3] p-4 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                              <Paperclip className="w-10 h-10 text-gray-400 mb-3" />
+                              <span className="text-sm font-medium text-center text-gray-700 dark:text-gray-300 break-all line-clamp-2 px-2">{file.filename}</span>
                             </a>
                           )}
-                          <div className="absolute bottom-0 left-0 right-0 bg-black/60 p-1.5 backdrop-blur-sm">
-                             <p className="text-[10px] text-white truncate text-center" title={file.filename}>{file.filename}</p>
+                          <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-2 backdrop-blur-md translate-y-full group-hover:translate-y-0 transition-transform">
+                             <p className="text-xs text-white truncate text-center" title={file.filename}>{file.filename}</p>
                           </div>
                         </div>
                       );
@@ -272,7 +288,7 @@ export default function ApprovalsPage() {
                   </div>
                 </div>
               )}
-            </div>
+                </div>
 
             {/* Direita: Controles e Rejeição */}
             <div className="space-y-4">

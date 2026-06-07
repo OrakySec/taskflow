@@ -15,7 +15,8 @@ import {
   Zap,
   Network,
   Inbox,
-  Monitor
+  Monitor,
+  Calendar
 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
@@ -24,6 +25,7 @@ const baseNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
   { href: "/portal", label: "Meu Portal", icon: Monitor, roles: ["CLIENT"] },
   { href: "/approvals", label: "Aprovações", icon: Inbox, roles: ["ADMIN", "MANAGER"] },
+  { href: "/calendar", label: "Calendário", icon: Calendar, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
   { href: "/tasks", label: "Tarefas", icon: CheckSquare, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
   { href: "/clients", label: "Clientes", icon: Briefcase, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
   { href: "/templates", label: "Templates", icon: LayoutTemplate, roles: ["ADMIN", "MANAGER", "COLLABORATOR"] },
