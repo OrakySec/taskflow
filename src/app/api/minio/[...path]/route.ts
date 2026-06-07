@@ -1,50 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
+import { minioClient } from "@/lib/minio";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
-    const minioHost = process.env.MINIO_ENDPOINT || 'localhost';
-    const minioPort = process.env.MINIO_PORT || '9000';
-    const useSSL = process.env.MINIO_USE_SSL === 'true';
-    const protocol = useSSL ? 'https' : 'http';
-    
-    // Extract query parameters correctly
-    const searchParams = request.nextUrl.searchParams.toString();
-    const query = searchParams ? `?${searchParams}` : '';
-    
-    // Extract the bucket and object path
-    // The params.path comes from the URL /api/minio/bucket-name/object-name.jpg
     const resolvedParams = await params;
-    const pathString = resolvedParams.path.join('/');
-    const url = `${protocol}://${minioHost}:${minioPort}/${pathString}${query}`;
-
-    console.log(`[Minio Proxy] Fetching ${url}`);
-
-    // Fetch from internal Minio
-    const response = await fetch(url, {
-      // Avoid caching at proxy level for presigned URLs
-      cache: 'no-store',
-    });
     
-    if (!response.ok) {
-      console.error(`[Minio Proxy] Failed with status ${response.status} for URL ${url}`);
-      return new NextResponse("File not found or access denied", { status: response.status });
+    // path is [bucket, ...objectPath]
+    if (!resolvedParams.path || resolvedParams.path.length < 2) {
+      return new NextResponse("Invalid path", { status: 400 });
     }
+    
+    const bucketName = resolvedParams.path[0];
+    const objectName = resolvedParams.path.slice(1).join('/');
 
-    // Return the response as a stream with the same headers
+    // Get object stat to retrieve Content-Type and size
+    const stat = await minioClient.statObject(bucketName, objectName);
+    
+    // Get the object stream from Minio
+    const dataStream = await minioClient.getObject(bucketName, objectName);
+    
     const headers = new Headers();
-    response.headers.forEach((value, key) => {
-      headers.set(key, value);
+    if (stat.metaData && stat.metaData['content-type']) {
+      headers.set('Content-Type', stat.metaData['content-type']);
+    }
+    headers.set('Content-Length', stat.size.toString());
+    
+    // Create a Web ReadableStream from the Node.js stream
+    const stream = new ReadableStream({
+      start(controller) {
+        dataStream.on('data', (chunk) => controller.enqueue(chunk));
+        dataStream.on('end', () => controller.close());
+        dataStream.on('error', (err) => controller.error(err));
+      }
     });
 
-    return new NextResponse(response.body, {
-      status: response.status,
+    return new NextResponse(stream, {
+      status: 200,
       headers,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("[Minio Proxy] Error:", error);
+    if (error.code === 'NotFound' || error.code === 'NoSuchKey') {
+      return new NextResponse("File not found", { status: 404 });
+    }
     return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
