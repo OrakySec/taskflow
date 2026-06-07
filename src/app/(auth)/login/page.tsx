@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { authenticate } from "./actions";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Loader2, Zap } from "lucide-react";
@@ -20,16 +20,12 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+      const result = await authenticate(email, password);
 
-      if (result?.error) {
-        setError("E-mail ou senha incorretos.");
+      if (result.error) {
+        setError(result.error);
         setLoading(false);
-      } else {
+      } else if (result.success) {
         // Usar window.location.href garante que o cache do Next.js App Router seja ignorado e a página recarregue buscando a nova sessão
         window.location.href = "/";
       }
