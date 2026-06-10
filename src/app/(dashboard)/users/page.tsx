@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { UserPlus, CheckSquare, Shield, Users } from "lucide-react";
+import { UserPlus, CheckSquare, Shield, Users, KeyRound } from "lucide-react";
 import { formatDate, getInitials, ROLE_LABELS } from "@/lib/utils";
 import DeleteUserButton from "@/components/users/DeleteUserButton";
 import type { Metadata } from "next";
@@ -28,7 +28,10 @@ export default async function UsersPage() {
           <h1 className="page-title">Equipe</h1>
           <p className="page-subtitle">{users.length} membro{users.length !== 1 ? "s" : ""} na equipe</p>
         </div>
-        <Link href="/users/invite" className="btn btn-primary"><UserPlus size={16} /> Convidar</Link>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <Link href="/users/new" className="btn btn-primary"><KeyRound size={16} /> Criar Usuário</Link>
+          <Link href="/users/invite" className="btn btn-secondary"><UserPlus size={16} /> Convidar por E-mail</Link>
+        </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
