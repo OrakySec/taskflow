@@ -26,8 +26,7 @@ export default function LoginPage() {
         setError(result.error);
         setLoading(false);
       } else if (result.success) {
-        // Usar window.location.href garante que o cache do Next.js App Router seja ignorado e a página recarregue buscando a nova sessão
-        window.location.href = "/";
+        window.location.href = result.redirectTo || "/";
       }
     } catch (err: any) {
       console.error("Erro ao fazer login:", err);
