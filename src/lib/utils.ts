@@ -105,6 +105,7 @@ export const STATUS_COLORS = {
 };
 
 export const ROLE_LABELS = {
+  SUPER_ADMIN: "Super Admin",
   ADMIN: "Administrador",
   MANAGER: "Gerente",
   COLLABORATOR: "Colaborador",
