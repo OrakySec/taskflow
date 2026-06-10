@@ -60,13 +60,20 @@ async function main() {
 
   const hashedPassword = await bcrypt.hash(password, 12);
 
+  // Garante que a empresa sistema existe
+  await prisma.company.upsert({
+    where: { slug: "system" },
+    update: {},
+    create: { id: "system-company-id", name: "Sistema TaskFlow", slug: "system" },
+  });
+
   const user = await prisma.user.create({
     data: {
       name,
       email,
       password: hashedPassword,
       role: "SUPER_ADMIN",
-      companyId: null,
+      companyId: "system-company-id",
     },
   });
 

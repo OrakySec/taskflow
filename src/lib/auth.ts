@@ -41,7 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) return null;
 
-        // SUPER_ADMIN não pertence a nenhuma empresa
+        // SUPER_ADMIN pertence à empresa sistema (não afeta queries de tenants)
         const isSuperAdmin = (user.role as string) === "SUPER_ADMIN";
 
         return {
@@ -49,8 +49,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           email: user.email,
           role: user.role,
-          companyId: user.companyId ?? null,
-          companyName: isSuperAdmin ? "Sistema" : user.company?.name ?? "",
+          companyId: user.companyId,
+          companyName: isSuperAdmin ? "Sistema TaskFlow" : user.company?.name ?? "",
           companySlug: isSuperAdmin ? "system" : user.company?.slug ?? "",
           avatar: user.avatar,
           isSuperAdmin,
@@ -63,7 +63,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = (user as never as { role: string }).role;
-        token.companyId = (user as never as { companyId: string | null }).companyId;
+        token.companyId = (user as never as { companyId: string }).companyId;
         token.companyName = (user as never as { companyName: string }).companyName;
         token.companySlug = (user as never as { companySlug: string }).companySlug;
         token.avatar = (user as never as { avatar: string | null }).avatar;
@@ -77,7 +77,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       session.user.id = token.id as string;
       session.user.role = token.role as string;
-      session.user.companyId = (token.companyId as string | null) ?? "";
+      session.user.companyId = (token.companyId as string) ?? "";
       session.user.companyName = token.companyName as string;
       session.user.companySlug = token.companySlug as string;
       session.user.avatar = token.avatar as string | null;
