@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
 
   const [totalCompanies, totalUsers, totalTasks, recentCompanies] = await Promise.all([
     prisma.company.count(),
-    prisma.user.count({ where: { role: { not: "SUPER_ADMIN" } } }),
+    prisma.user.count({ where: { role: { not: "SUPER_ADMIN" as never } } }),
     prisma.task.count(),
     prisma.company.findMany({
       orderBy: { createdAt: "desc" },

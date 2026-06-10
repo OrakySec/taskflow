@@ -4,10 +4,11 @@ declare module "next-auth" {
   interface User {
     id: string;
     role: string;
-    companyId: string;
+    companyId: string | null;
     companyName: string;
     companySlug: string;
     avatar: string | null;
+    isSuperAdmin?: boolean;
   }
 
   interface Session {
@@ -20,6 +21,7 @@ declare module "next-auth" {
       companyName: string;
       companySlug: string;
       avatar: string | null;
+      isSuperAdmin: boolean;
     };
   }
 }
@@ -28,9 +30,10 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role: string;
-    companyId: string;
+    companyId: string | null;
     companyName: string;
     companySlug: string;
     avatar: string | null;
+    isSuperAdmin?: boolean;
   }
 }

@@ -42,7 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!isValid) return null;
 
         // SUPER_ADMIN não pertence a nenhuma empresa
-        const isSuperAdmin = user.role === "SUPER_ADMIN";
+        const isSuperAdmin = (user.role as string) === "SUPER_ADMIN";
 
         return {
           id: user.id,
