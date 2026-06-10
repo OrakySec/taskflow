@@ -24,7 +24,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const existingTeam = await prisma.team.findFirst({
-      where: { id: id, companyId: user.companyId }
+      where: { id: id, companyId: user.companyId ?? "" }
     });
 
     if (!existingTeam) {
@@ -73,7 +73,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
     const existingTeam = await prisma.team.findFirst({
-      where: { id: id, companyId: user.companyId }
+      where: { id: id, companyId: user.companyId ?? "" }
     });
 
     if (!existingTeam) {
