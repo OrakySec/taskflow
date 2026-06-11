@@ -24,7 +24,7 @@ interface Props {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-const MAX_SIZE = 10 * 1024 * 1024; // 10 MB
+const MAX_SIZE = 100 * 1024 * 1024; // 100 MB
 
 const ALLOWED_TYPES = [
   "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
@@ -185,7 +185,7 @@ export default function AttachmentUploader({
               Arraste arquivos ou clique para selecionar
             </span>
             <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
-              Imagens, PDF, Excel, Word, ZIP — máx. 10 MB
+              Imagens, PDF, Excel, Word, ZIP — máx. 100 MB
             </span>
           </div>
         )}

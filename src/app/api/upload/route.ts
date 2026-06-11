@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server';
 import { minioClient, BUCKET_NAME, ensureBucketExists } from '@/lib/minio';
 import { v4 as uuidv4 } from 'uuid';
 
+// Aumenta o limite de tamanho do body para 100 MB
+export const config = {
+  api: { bodyParser: { sizeLimit: '100mb' } },
+};
+
+export const maxDuration = 60; // segundos (para uploads grandes)
+
 export async function POST(request: Request) {
   try {
     // Garantir que o bucket exista
