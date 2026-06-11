@@ -1,9 +1,6 @@
 version: '3.8'
 
 services:
-  # ──────────────────────────────────────────────────────────────────────────────
-  # Aplicação Next.js
-  # ──────────────────────────────────────────────────────────────────────────────
   app:
     image: ghcr.io/orakysec/taskflow:latest
     environment:
@@ -23,7 +20,7 @@ services:
       AUTH_TRUST_HOST: "true"
     networks:
       - YkaroNET
-      - internal # <-- ADICIONADO: Para o app falar com o banco e o cron
+      - default # <-- ADICIONADO: Rede padrão invisível
     deploy:
       replicas: 1
       restart_policy:
@@ -38,9 +35,6 @@ services:
         - "traefik.http.routers.taskflow.tls.certresolver=letsencryptresolver"
         - "traefik.http.services.taskflow.loadbalancer.server.port=3000"
 
-  # ──────────────────────────────────────────────────────────────────────────────
-  # PostgreSQL
-  # ──────────────────────────────────────────────────────────────────────────────
   postgres:
     image: postgres:16-alpine
     environment:
@@ -50,7 +44,7 @@ services:
     volumes:
       - taskflow_postgres_data:/var/lib/postgresql/data
     networks:
-      - internal # <-- CORRIGIDO: Tiramos a YkaroNET daqui
+      - default # <-- CORRIGIDO: Usa a rede padrão
     deploy:
       replicas: 1
       restart_policy:
@@ -59,9 +53,6 @@ services:
         constraints:
           - node.role == manager
 
-  # ──────────────────────────────────────────────────────────────────────────────
-  # MinIO (Storage de anexos)
-  # ──────────────────────────────────────────────────────────────────────────────
   minio:
     image: minio/minio
     command: server /data --console-address ":9001"
@@ -71,7 +62,7 @@ services:
     volumes:
       - taskflow_minio_data:/data
     networks:
-      - internal # <-- CORRIGIDO: Tiramos a YkaroNET daqui
+      - default # <-- CORRIGIDO: Usa a rede padrão
     deploy:
       replicas: 1
       restart_policy:
@@ -80,9 +71,6 @@ services:
         constraints:
           - node.role == manager
 
-  # ──────────────────────────────────────────────────────────────────────────────
-  # Cron — alertas de prazo + resumo diário
-  # ──────────────────────────────────────────────────────────────────────────────
   cron:
     image: alpine:3.19
     entrypoint:
@@ -95,7 +83,7 @@ services:
     environment:
       CRON_SECRET: "${CRON_SECRET}"
     networks:
-      - internal # <-- CORRIGIDO: Tiramos a YkaroNET daqui
+      - default # <-- CORRIGIDO: Usa a rede padrão
     deploy:
       replicas: 1
       restart_policy:
@@ -104,9 +92,7 @@ services:
 networks:
   YkaroNET:
     external: true
-  internal: # <-- ADICIONADO: Rede interna isolada para este projeto
-    driver: overlay
-    attachable: true
+  # APAGAMOS O BLOCO "internal" DAQUI!
 
 volumes:
   taskflow_postgres_data:
