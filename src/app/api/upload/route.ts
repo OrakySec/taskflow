@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Aumenta o limite de tamanho do body para 100 MB
 export const config = {
-  api: { bodyParser: { sizeLimit: '100mb' } },
+  api: { bodyParser: { sizeLimit: '20mb' } },
 };
 
 export const maxDuration = 60; // segundos (para uploads grandes)
