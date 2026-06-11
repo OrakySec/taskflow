@@ -14,7 +14,7 @@ export const minioClient = new Minio.Client({
   secretKey,
 });
 
-export const BUCKET_NAME = process.env.MINIO_BUCKET_NAME || 'taskflow-uploads';
+export const BUCKET_NAME = process.env.MINIO_BUCKET || process.env.MINIO_BUCKET_NAME || 'taskflow-files';
 
 // Assegura que o bucket existe
 export async function ensureBucketExists() {
