@@ -2,8 +2,9 @@
 
 import { useState, useRef, useCallback } from "react";
 import {
-  Paperclip, X, Upload, File, FileImage, FileText,
+  Paperclip, X, Upload, File, FileText,
   FileSpreadsheet, Archive, Download, Loader2, AlertCircle,
+  ZoomIn, ChevronLeft, ChevronRight,
 } from "lucide-react";
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -16,10 +17,10 @@ export interface AttachmentItem {
 }
 
 interface Props {
-  taskId?: string;                          // se undefined, modo "pré-criação"
+  taskId?: string;
   initialAttachments?: AttachmentItem[];
-  onChange?: (attachments: AttachmentItem[]) => void; // modo pré-criação
-  onUploaded?: (attachment: AttachmentItem) => void;  // modo tarefa existente
+  onChange?: (attachments: AttachmentItem[]) => void;
+  onUploaded?: (attachment: AttachmentItem) => void;
   onDeleted?: (id: string) => void;
 }
 
@@ -39,21 +40,168 @@ const ALLOWED_TYPES = [
   "application/zip", "application/x-rar-compressed",
 ];
 
+const isImage = (mimeType: string) => mimeType.startsWith("image/");
+
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function FileIcon({ mimeType }: { mimeType: string }) {
-  const s = { size: 16 };
-  if (mimeType.startsWith("image/")) return <FileImage {...s} style={{ color: "#8b5cf6" }} />;
+function FileIcon({ mimeType, size = 16 }: { mimeType: string; size?: number }) {
+  const s = { size };
   if (mimeType.includes("pdf")) return <FileText {...s} style={{ color: "#ef4444" }} />;
   if (mimeType.includes("sheet") || mimeType.includes("excel") || mimeType.includes("csv"))
     return <FileSpreadsheet {...s} style={{ color: "#22c55e" }} />;
   if (mimeType.includes("zip") || mimeType.includes("rar"))
     return <Archive {...s} style={{ color: "#f59e0b" }} />;
   return <File {...s} style={{ color: "var(--text-muted)" }} />;
+}
+
+// ─── Lightbox ────────────────────────────────────────────────────────────────
+function Lightbox({
+  images,
+  startIndex,
+  onClose,
+}: {
+  images: AttachmentItem[];
+  startIndex: number;
+  onClose: () => void;
+}) {
+  const [idx, setIdx] = useState(startIndex);
+  const current = images[idx];
+
+  const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
+  const next = () => setIdx((i) => (i + 1) % images.length);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 9999,
+        background: "rgba(0,0,0,0.92)",
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+      }}
+    >
+      {/* Header */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          position: "absolute", top: 0, left: 0, right: 0,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "16px 20px",
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.7), transparent)",
+        }}
+      >
+        <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>
+          {current.filename}
+          <span style={{ marginLeft: "10px", opacity: 0.5, fontSize: "11px" }}>
+            {idx + 1} / {images.length}
+          </span>
+        </span>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <a
+            href={current.fileUrl}
+            download={current.filename}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "flex", alignItems: "center", gap: "6px",
+              padding: "6px 12px", borderRadius: "8px",
+              background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
+              color: "white", textDecoration: "none", fontSize: "12px", fontWeight: 500,
+            }}
+          >
+            <Download size={14} /> Baixar
+          </a>
+          <button
+            onClick={onClose}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: "32px", height: "32px", borderRadius: "8px",
+              background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
+              cursor: "pointer", color: "white",
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Image */}
+      <img
+        src={current.fileUrl}
+        alt={current.filename}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: "90vw", maxHeight: "80vh",
+          objectFit: "contain", borderRadius: "8px",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.5)",
+        }}
+      />
+
+      {/* Nav arrows */}
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); prev(); }}
+            style={{
+              position: "absolute", left: "16px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: "44px", height: "44px", borderRadius: "50%",
+              background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
+              cursor: "pointer", color: "white",
+            }}
+          >
+            <ChevronLeft size={22} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); next(); }}
+            style={{
+              position: "absolute", right: "16px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              width: "44px", height: "44px", borderRadius: "50%",
+              background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
+              cursor: "pointer", color: "white",
+            }}
+          >
+            <ChevronRight size={22} />
+          </button>
+        </>
+      )}
+
+      {/* Thumbnails strip */}
+      {images.length > 1 && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: "absolute", bottom: "16px",
+            display: "flex", gap: "8px",
+            padding: "8px", borderRadius: "12px",
+            background: "rgba(0,0,0,0.5)",
+          }}
+        >
+          {images.map((img, i) => (
+            <img
+              key={img.id}
+              src={img.fileUrl}
+              alt={img.filename}
+              onClick={() => setIdx(i)}
+              style={{
+                width: "48px", height: "48px",
+                objectFit: "cover", borderRadius: "6px",
+                cursor: "pointer",
+                border: i === idx ? "2px solid #8b5cf6" : "2px solid transparent",
+                opacity: i === idx ? 1 : 0.5,
+                transition: "all 0.15s",
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
@@ -68,7 +216,11 @@ export default function AttachmentUploader({
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const imageAttachments = attachments.filter((a) => isImage(a.mimeType));
+  const fileAttachments = attachments.filter((a) => !isImage(a.mimeType));
 
   const uploadFiles = useCallback(async (files: File[]) => {
     const newErrors: string[] = [];
@@ -78,7 +230,7 @@ export default function AttachmentUploader({
         return false;
       }
       if (f.size > MAX_SIZE) {
-        newErrors.push(`${f.name}: excede 10 MB.`);
+        newErrors.push(`${f.name}: excede 20 MB.`);
         return false;
       }
       return true;
@@ -89,7 +241,6 @@ export default function AttachmentUploader({
     setUploading(true);
     for (const file of valid) {
       try {
-        // 1. Faz upload para o MinIO
         const fd = new FormData();
         fd.append("file", file);
         const upRes = await fetch("/api/upload", { method: "POST", body: fd });
@@ -100,7 +251,6 @@ export default function AttachmentUploader({
         let newAttachment: AttachmentItem;
 
         if (taskId) {
-          // 2a. Tarefa existente → salva no banco imediatamente
           const saveRes = await fetch("/api/attachments", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -111,7 +261,6 @@ export default function AttachmentUploader({
           newAttachment = saved;
           onUploaded?.(newAttachment);
         } else {
-          // 2b. Tarefa nova → guarda em memória, pai salva depois
           newAttachment = { id: `pending-${Date.now()}-${Math.random()}`, filename, fileUrl, fileSize, mimeType };
         }
 
@@ -147,6 +296,15 @@ export default function AttachmentUploader({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+
+      {/* Lightbox */}
+      {lightboxIndex !== null && (
+        <Lightbox
+          images={imageAttachments}
+          startIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
 
       {/* Drop zone */}
       <div
@@ -202,10 +360,65 @@ export default function AttachmentUploader({
         </div>
       )}
 
-      {/* Lista de anexos */}
-      {attachments.length > 0 && (
+      {/* ── Grid de imagens ── */}
+      {imageAttachments.length > 0 && (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+          gap: "8px",
+        }}>
+          {imageAttachments.map((att, i) => (
+            <div
+              key={att.id}
+              style={{ position: "relative", aspectRatio: "1", borderRadius: "10px", overflow: "hidden", background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
+            >
+              {/* Thumbnail */}
+              <img
+                src={att.fileUrl}
+                alt={att.filename}
+                onClick={() => setLightboxIndex(i)}
+                style={{ width: "100%", height: "100%", objectFit: "cover", cursor: "zoom-in", display: "block" }}
+              />
+
+              {/* Hover overlay */}
+              <div
+                onClick={() => setLightboxIndex(i)}
+                style={{
+                  position: "absolute", inset: 0,
+                  background: "rgba(0,0,0,0.45)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  opacity: 0, transition: "opacity 0.15s", cursor: "zoom-in",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "0")}
+              >
+                <ZoomIn size={22} color="white" />
+              </div>
+
+              {/* Delete button */}
+              <button
+                type="button"
+                onClick={() => handleDelete(att)}
+                style={{
+                  position: "absolute", top: "4px", right: "4px",
+                  width: "22px", height: "22px", borderRadius: "50%",
+                  background: "rgba(0,0,0,0.65)", border: "none",
+                  cursor: "pointer", color: "white",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}
+                title="Remover"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Lista de arquivos não-imagem ── */}
+      {fileAttachments.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-          {attachments.map((att) => (
+          {fileAttachments.map((att) => (
             <div
               key={att.id}
               style={{
