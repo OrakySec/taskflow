@@ -2,22 +2,25 @@
 
 import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
-import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function authenticate(email: string, password: string) {
   try {
+    // Busca o role ANTES do signIn para evitar problema de timing com cookie de sessão
+    const user = await prisma.user.findFirst({
+      where: { email, isActive: true },
+      select: { role: true },
+    });
+
     await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
 
-    // Verificar o role do usuário logado para decidir o redirecionamento
-    const session = await auth();
-    if (session?.user?.role === "SUPER_ADMIN") {
-      return { success: true, redirectTo: "/admin" };
-    }
-    return { success: true, redirectTo: "/" };
+    // Se chegou aqui, login foi bem-sucedido
+    const isSuperAdmin = (user?.role as string) === "SUPER_ADMIN";
+    return { success: true, redirectTo: isSuperAdmin ? "/admin" : "/" };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
@@ -31,3 +34,4 @@ export async function authenticate(email: string, password: string) {
     return { error: "Erro inesperado ao conectar." };
   }
 }
+
