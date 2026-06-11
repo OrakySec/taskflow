@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowLeft, LayoutTemplate } from "lucide-react";
+import { Loader2, ArrowLeft, LayoutTemplate, Paperclip } from "lucide-react";
 import Link from "next/link";
 import CustomSelect, { SelectItem } from "@/components/ui/CustomSelect";
 import { getInitials, getAvatarColor } from "@/lib/utils";
+import AttachmentUploader, { AttachmentItem } from "./AttachmentUploader";
 
 interface NewTaskFormProps {
   users: { id: string; name: string }[];
@@ -24,6 +25,7 @@ export default function NewTaskForm({ users, clients, templates, teams = [] }: N
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [pendingAttachments, setPendingAttachments] = useState<AttachmentItem[]>([]);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -82,6 +84,25 @@ export default function NewTaskForm({ users, clients, templates, teams = [] }: N
       setError(data.error || "Erro ao criar tarefa.");
       setLoading(false);
       return;
+    }
+
+    // Vincular anexos pendentes à tarefa recém-criada
+    if (pendingAttachments.length > 0) {
+      await Promise.all(
+        pendingAttachments.map((att) =>
+          fetch("/api/attachments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              taskId: data.id,
+              filename: att.filename,
+              fileUrl: att.fileUrl,
+              fileSize: att.fileSize,
+              mimeType: att.mimeType,
+            }),
+          })
+        )
+      );
     }
 
     router.push(`/tasks/${data.id}`);
@@ -253,6 +274,17 @@ export default function NewTaskForm({ users, clients, templates, teams = [] }: N
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Anexos */}
+          <div className="form-group">
+            <label className="label">
+              <Paperclip size={13} style={{ display: "inline", marginRight: "4px" }} />
+              Anexos
+            </label>
+            <AttachmentUploader
+              onChange={setPendingAttachments}
+            />
           </div>
         </div>
 

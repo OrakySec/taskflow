@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   LayoutTemplate,
 } from "lucide-react";
+import AttachmentUploader, { AttachmentItem } from "./AttachmentUploader";
 import {
   PRIORITY_LABELS,
   STATUS_LABELS,
@@ -124,6 +125,15 @@ export default function TaskDetail({
 }: TaskDetailProps) {
   const router = useRouter();
   const [task, setTask] = useState(initialTask);
+  const [attachments, setAttachments] = useState<AttachmentItem[]>(
+    initialTask.attachments.map((a) => ({
+      id: a.id,
+      filename: a.filename,
+      fileUrl: a.fileUrl?.replace(/^http:\/\/minio:9000/, "/api/minio") ?? a.fileUrl,
+      fileSize: a.fileSize,
+      mimeType: a.mimeType,
+    }))
+  );
   const [activeTab, setActiveTab] = useState<ActiveTab>("chat");
   const [comment, setComment] = useState("");
   const [mentionSearch, setMentionSearch] = useState<string | null>(null);
@@ -745,63 +755,12 @@ export default function TaskDetail({
           {/* Attachments tab */}
           {activeTab === "attachments" && (
             <div style={{ padding: "16px" }}>
-              {task.attachments.length === 0 ? (
-                <div
-                  style={{
-                    textAlign: "center",
-                    padding: "40px",
-                    color: "var(--text-muted)",
-                    fontSize: "13px",
-                  }}
-                >
-                  <Paperclip size={28} style={{ marginBottom: "8px", opacity: 0.4 }} />
-                  <p>Nenhum anexo ainda.</p>
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {task.attachments.map((att) => {
-                    const displayUrl = att.fileUrl?.replace(/^http:\/\/minio:9000/, '/api/minio') || '#';
-                    return (
-                      <a
-                        key={att.id}
-                        href={displayUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "10px",
-                          padding: "10px 12px",
-                          background: "var(--bg-secondary)",
-                          border: "1px solid var(--border)",
-                          borderRadius: "8px",
-                          textDecoration: "none",
-                          transition: "all 0.15s",
-                        }}
-                      >
-                        <Paperclip size={14} color="var(--accent-hover)" />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div
-                            style={{
-                              fontSize: "13px",
-                              color: "var(--text-primary)",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {att.filename}
-                          </div>
-                          <div style={{ fontSize: "11px", color: "var(--text-muted)" }}>
-                            {(att.fileSize / 1024).toFixed(0)} KB ·{" "}
-                            {formatRelativeTime(att.createdAt)}
-                          </div>
-                        </div>
-                      </a>
-                    );
-                  })}
-                </div>
-              )}
+              <AttachmentUploader
+                taskId={task.id}
+                initialAttachments={attachments}
+                onUploaded={(att) => setAttachments((prev) => [...prev, att])}
+                onDeleted={(id) => setAttachments((prev) => prev.filter((a) => a.id !== id))}
+              />
             </div>
           )}
         </div>
