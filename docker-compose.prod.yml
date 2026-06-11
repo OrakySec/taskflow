@@ -23,6 +23,7 @@ services:
       AUTH_TRUST_HOST: "true"
     networks:
       - YkaroNET
+      - internal # <-- ADICIONADO: Para o app falar com o banco e o cron
     deploy:
       replicas: 1
       restart_policy:
@@ -49,7 +50,7 @@ services:
     volumes:
       - taskflow_postgres_data:/var/lib/postgresql/data
     networks:
-      - YkaroNET
+      - internal # <-- CORRIGIDO: Tiramos a YkaroNET daqui
     deploy:
       replicas: 1
       restart_policy:
@@ -70,7 +71,7 @@ services:
     volumes:
       - taskflow_minio_data:/data
     networks:
-      - YkaroNET
+      - internal # <-- CORRIGIDO: Tiramos a YkaroNET daqui
     deploy:
       replicas: 1
       restart_policy:
@@ -94,7 +95,7 @@ services:
     environment:
       CRON_SECRET: "${CRON_SECRET}"
     networks:
-      - YkaroNET
+      - internal # <-- CORRIGIDO: Tiramos a YkaroNET daqui
     deploy:
       replicas: 1
       restart_policy:
@@ -103,6 +104,9 @@ services:
 networks:
   YkaroNET:
     external: true
+  internal: # <-- ADICIONADO: Rede interna isolada para este projeto
+    driver: overlay
+    attachable: true
 
 volumes:
   taskflow_postgres_data:
