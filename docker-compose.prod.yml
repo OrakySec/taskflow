@@ -60,7 +60,7 @@ services:
       MINIO_ROOT_USER: "${MINIO_ACCESS_KEY}"
       MINIO_ROOT_PASSWORD: "${MINIO_SECRET_KEY}"
     volumes:
-      - taskflow_minio_data:/data
+      - taskflow_minio_data_v2:/data
     networks:
       - default # <-- CORRIGIDO: Usa a rede padrão
     deploy:
@@ -96,4 +96,4 @@ networks:
 
 volumes:
   taskflow_postgres_data:
-  taskflow_minio_data:
+  taskflow_minio_data_v2:
