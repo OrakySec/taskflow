@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   Paperclip, X, Upload, File, FileText,
   FileSpreadsheet, Archive, Download, Loader2, AlertCircle,
-  ZoomIn, ChevronLeft, ChevronRight,
+  ZoomIn, ChevronLeft, ChevronRight, PlaySquare,
 } from "lucide-react";
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ const MAX_SIZE = 20 * 1024 * 1024; // 20 MB
 
 const ALLOWED_TYPES = [
   "image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml",
+  "video/mp4", "video/webm", "video/ogg", "video/quicktime",
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -40,7 +42,7 @@ const ALLOWED_TYPES = [
   "application/zip", "application/x-rar-compressed",
 ];
 
-const isImage = (mimeType: string) => mimeType.startsWith("image/");
+const isMedia = (mimeType: string) => mimeType.startsWith("image/") || mimeType.startsWith("video/");
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -69,12 +71,19 @@ function Lightbox({
   onClose: () => void;
 }) {
   const [idx, setIdx] = useState(startIndex);
+  const [mounted, setMounted] = useState(false);
   const current = images[idx];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const prev = () => setIdx((i) => (i - 1 + images.length) % images.length);
   const next = () => setIdx((i) => (i + 1) % images.length);
 
-  return (
+  if (!mounted || typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       onClick={onClose}
       style={{
@@ -129,17 +138,31 @@ function Lightbox({
         </div>
       </div>
 
-      {/* Image */}
-      <img
-        src={current.fileUrl}
-        alt={current.filename}
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          maxWidth: "90vw", maxHeight: "80vh",
-          objectFit: "contain", borderRadius: "8px",
-          boxShadow: "0 25px 80px rgba(0,0,0,0.5)",
-        }}
-      />
+      {/* Media Content */}
+      {current.mimeType.startsWith("video/") ? (
+        <video
+          src={current.fileUrl}
+          controls
+          autoPlay
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            maxWidth: "90vw", maxHeight: "80vh",
+            objectFit: "contain", borderRadius: "8px",
+            boxShadow: "0 25px 80px rgba(0,0,0,0.5)",
+          }}
+        />
+      ) : (
+        <img
+          src={current.fileUrl}
+          alt={current.filename}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            maxWidth: "90vw", maxHeight: "80vh",
+            objectFit: "contain", borderRadius: "8px",
+            boxShadow: "0 25px 80px rgba(0,0,0,0.5)",
+          }}
+        />
+      )}
 
       {/* Nav arrows */}
       {images.length > 1 && (
@@ -183,24 +206,41 @@ function Lightbox({
           }}
         >
           {images.map((img, i) => (
-            <img
-              key={img.id}
-              src={img.fileUrl}
-              alt={img.filename}
-              onClick={() => setIdx(i)}
-              style={{
-                width: "48px", height: "48px",
-                objectFit: "cover", borderRadius: "6px",
-                cursor: "pointer",
-                border: i === idx ? "2px solid #8b5cf6" : "2px solid transparent",
-                opacity: i === idx ? 1 : 0.5,
-                transition: "all 0.15s",
-              }}
-            />
+            img.mimeType.startsWith("video/") ? (
+              <video
+                key={img.id}
+                src={img.fileUrl}
+                onClick={() => setIdx(i)}
+                style={{
+                  width: "48px", height: "48px",
+                  objectFit: "cover", borderRadius: "6px",
+                  cursor: "pointer",
+                  border: i === idx ? "2px solid #8b5cf6" : "2px solid transparent",
+                  opacity: i === idx ? 1 : 0.5,
+                  transition: "all 0.15s",
+                }}
+              />
+            ) : (
+              <img
+                key={img.id}
+                src={img.fileUrl}
+                alt={img.filename}
+                onClick={() => setIdx(i)}
+                style={{
+                  width: "48px", height: "48px",
+                  objectFit: "cover", borderRadius: "6px",
+                  cursor: "pointer",
+                  border: i === idx ? "2px solid #8b5cf6" : "2px solid transparent",
+                  opacity: i === idx ? 1 : 0.5,
+                  transition: "all 0.15s",
+                }}
+              />
+            )
           ))}
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -219,8 +259,8 @@ export default function AttachmentUploader({
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const imageAttachments = attachments.filter((a) => isImage(a.mimeType));
-  const fileAttachments = attachments.filter((a) => !isImage(a.mimeType));
+  const mediaAttachments = attachments.filter((a) => isMedia(a.mimeType));
+  const fileAttachments = attachments.filter((a) => !isMedia(a.mimeType));
 
   const uploadFiles = useCallback(async (files: File[]) => {
     const newErrors: string[] = [];
@@ -300,7 +340,7 @@ export default function AttachmentUploader({
       {/* Lightbox */}
       {lightboxIndex !== null && (
         <Lightbox
-          images={imageAttachments}
+          images={mediaAttachments}
           startIndex={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
         />
@@ -360,25 +400,37 @@ export default function AttachmentUploader({
         </div>
       )}
 
-      {/* ── Grid de imagens ── */}
-      {imageAttachments.length > 0 && (
+      {/* ── Grid de Mídia (Imagens/Vídeos) ── */}
+      {mediaAttachments.length > 0 && (
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
           gap: "8px",
         }}>
-          {imageAttachments.map((att, i) => (
+          {mediaAttachments.map((att, i) => (
             <div
               key={att.id}
               style={{ position: "relative", aspectRatio: "1", borderRadius: "10px", overflow: "hidden", background: "var(--bg-secondary)", border: "1px solid var(--border)" }}
             >
               {/* Thumbnail */}
-              <img
-                src={att.fileUrl}
-                alt={att.filename}
-                onClick={() => setLightboxIndex(i)}
-                style={{ width: "100%", height: "100%", objectFit: "cover", cursor: "zoom-in", display: "block" }}
-              />
+              {att.mimeType.startsWith("video/") ? (
+                <>
+                  <video
+                    src={att.fileUrl}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", cursor: "zoom-in", display: "block" }}
+                  />
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.2)", pointerEvents: "none" }}>
+                    <PlaySquare size={28} color="white" opacity={0.8} />
+                  </div>
+                </>
+              ) : (
+                <img
+                  src={att.fileUrl}
+                  alt={att.filename}
+                  onClick={() => setLightboxIndex(i)}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", cursor: "zoom-in", display: "block" }}
+                />
+              )}
 
               {/* Hover overlay */}
               <div
