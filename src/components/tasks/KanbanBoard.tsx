@@ -25,6 +25,7 @@ interface Task {
   status: TaskStatus;
   deadline: Date | null;
   createdAt: Date;
+  updatedAt: Date;
   client: { name: string } | null;
   assignedTo: { id: string; name: string } | null;
   _count: { comments: number; attachments: number };
@@ -173,14 +174,22 @@ export default function KanbanBoard({ initialTasks, columns = DEFAULT_COLUMNS, r
         onMouseMove={handleMouseMove}
         className={`flex gap-6 overflow-x-auto pb-4 h-full custom-scrollbar ${isDraggingScroll ? 'cursor-grabbing' : ''}`}
       >
-        {columns.map((col) => (
-          <KanbanColumn
-            key={col.id}
-            column={col as any}
-            tasks={tasks.filter((t) => t.status === col.id)}
-            readonly={readonly}
-          />
-        ))}
+        {columns.map((col) => {
+          const columnTasks = tasks.filter((t) => t.status === col.id);
+          
+          if (col.id === "DONE" || col.id === "FAILED") {
+            columnTasks.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+          }
+
+          return (
+            <KanbanColumn
+              key={col.id}
+              column={col as any}
+              tasks={columnTasks}
+              readonly={readonly}
+            />
+          );
+        })}
       </div>
 
       <DragOverlay>
