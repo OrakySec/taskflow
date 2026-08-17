@@ -18,6 +18,7 @@ services:
       NEXT_PUBLIC_APP_URL: "https://taskflow.ykaromarques.com"
       CRON_SECRET: "${CRON_SECRET}"
       AUTH_TRUST_HOST: "true"
+      DISABLE_REGISTRATION: "${DISABLE_REGISTRATION}"
     networks:
       - YkaroNET
       - default # <-- ADICIONADO: Rede padrão invisível
