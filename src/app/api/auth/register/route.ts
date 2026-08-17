@@ -20,13 +20,18 @@ function generateSlug(name: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  // Desativado temporariamente
-  if (process.env.DISABLE_REGISTRATION !== "false") {
+  const disableReg = process.env.DISABLE_REGISTRATION;
+  console.log("[Register] DISABLE_REGISTRATION value:", JSON.stringify(disableReg));
+
+  // Bloqueia quando DISABLE_REGISTRATION for explicitamente "true" ou quando não for definido
+  if (disableReg !== "false") {
+    console.log("[Register] Registration blocked.");
     return NextResponse.json(
       { error: "A criação de novas contas está temporariamente desativada. O sistema é restrito apenas a convidados no momento." },
       { status: 403 }
     );
   }
+  console.log("[Register] Registration allowed.");
 
   try {
     const body = await req.json();
